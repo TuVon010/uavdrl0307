@@ -1,0 +1,1205 @@
+choose to use cpu...
+Number of agents: 13
+Observation dims: [49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49]
+Action dims: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 12, 12, 12]
+Share observation dim: 637
+
+  [Episode 0] Avg delay: 9.164811 s | Avg system energy: 442.2394 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 0/1000 episodes, total num timesteps 300/300000, FPS 38.
+
+  average reward: -195.0458
+
+  [Episode 5] Avg delay: 7.491150 s | Avg system energy: 434.9798 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 5/1000 episodes, total num timesteps 1800/300000, FPS 38.
+
+  average reward: -154.5050
+
+  [Episode 10] Avg delay: 6.947825 s | Avg system energy: 427.0218 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 10/1000 episodes, total num timesteps 3300/300000, FPS 38.
+
+  average reward: -152.1573
+
+  [Episode 15] Avg delay: 7.491885 s | Avg system energy: 435.6007 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 15/1000 episodes, total num timesteps 4800/300000, FPS 38.
+
+  average reward: -147.8968
+
+  [Episode 20] Avg delay: 6.741537 s | Avg system energy: 428.5723 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 20/1000 episodes, total num timesteps 6300/300000, FPS 38.
+
+  average reward: -133.1150
+
+  [Episode 25] Avg delay: 6.202440 s | Avg system energy: 419.4373 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 25/1000 episodes, total num timesteps 7800/300000, FPS 38.
+
+  average reward: -110.0829
+
+  [Episode 30] Avg delay: 5.190601 s | Avg system energy: 418.3015 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 30/1000 episodes, total num timesteps 9300/300000, FPS 38.
+
+  average reward: -97.7416
+
+  [Episode 35] Avg delay: 4.492303 s | Avg system energy: 416.8113 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 35/1000 episodes, total num timesteps 10800/300000, FPS 38.
+
+  average reward: -95.9659
+
+  [Episode 40] Avg delay: 4.707369 s | Avg system energy: 417.5424 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 40/1000 episodes, total num timesteps 12300/300000, FPS 38.
+
+  average reward: -89.2098
+
+  [Episode 45] Avg delay: 4.511812 s | Avg system energy: 417.4436 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 45/1000 episodes, total num timesteps 13800/300000, FPS 38.
+
+  average reward: -80.7221
+
+  [Episode 50] Avg delay: 3.812361 s | Avg system energy: 416.0807 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 50/1000 episodes, total num timesteps 15300/300000, FPS 38.
+
+  average reward: -72.2737
+
+  [Episode 55] Avg delay: 4.269642 s | Avg system energy: 417.7176 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 55/1000 episodes, total num timesteps 16800/300000, FPS 39.
+
+  average reward: -67.0992
+
+  [Episode 60] Avg delay: 3.780553 s | Avg system energy: 416.5488 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 60/1000 episodes, total num timesteps 18300/300000, FPS 39.
+
+  average reward: -64.7766
+
+  [Episode 65] Avg delay: 3.784545 s | Avg system energy: 417.5048 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 65/1000 episodes, total num timesteps 19800/300000, FPS 39.
+
+  average reward: -57.7675
+
+  [Episode 70] Avg delay: 3.377296 s | Avg system energy: 417.2613 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 70/1000 episodes, total num timesteps 21300/300000, FPS 39.
+
+  average reward: -49.5143
+
+  [Episode 75] Avg delay: 3.321169 s | Avg system energy: 412.7561 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 75/1000 episodes, total num timesteps 22800/300000, FPS 39.
+
+  average reward: -47.3813
+
+  [Episode 80] Avg delay: 3.520824 s | Avg system energy: 418.5975 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 80/1000 episodes, total num timesteps 24300/300000, FPS 40.
+
+  average reward: -48.3182
+
+  [Episode 85] Avg delay: 3.184454 s | Avg system energy: 411.7428 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 85/1000 episodes, total num timesteps 25800/300000, FPS 40.
+
+  average reward: -45.9179
+
+  [Episode 90] Avg delay: 2.920392 s | Avg system energy: 408.7244 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 90/1000 episodes, total num timesteps 27300/300000, FPS 40.
+
+  average reward: -40.7882
+
+  [Episode 95] Avg delay: 2.918551 s | Avg system energy: 420.4452 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 95/1000 episodes, total num timesteps 28800/300000, FPS 40.
+
+  average reward: -39.9426
+
+  [Episode 100] Avg delay: 2.881057 s | Avg system energy: 414.7162 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 100/1000 episodes, total num timesteps 30300/300000, FPS 40.
+
+  average reward: -38.1043
+
+  [Episode 105] Avg delay: 2.711831 s | Avg system energy: 407.4517 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 105/1000 episodes, total num timesteps 31800/300000, FPS 40.
+
+  average reward: -33.5638
+
+  [Episode 110] Avg delay: 2.676898 s | Avg system energy: 413.6538 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 110/1000 episodes, total num timesteps 33300/300000, FPS 40.
+
+  average reward: -32.7501
+
+  [Episode 115] Avg delay: 2.964435 s | Avg system energy: 416.3180 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 115/1000 episodes, total num timesteps 34800/300000, FPS 40.
+
+  average reward: -35.5590
+
+  [Episode 120] Avg delay: 2.884056 s | Avg system energy: 417.9713 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 120/1000 episodes, total num timesteps 36300/300000, FPS 40.
+
+  average reward: -35.3868
+
+  [Episode 125] Avg delay: 2.995790 s | Avg system energy: 414.4091 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 125/1000 episodes, total num timesteps 37800/300000, FPS 40.
+
+  average reward: -34.7965
+
+  [Episode 130] Avg delay: 2.623270 s | Avg system energy: 410.0477 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 130/1000 episodes, total num timesteps 39300/300000, FPS 41.
+
+  average reward: -32.4001
+
+  [Episode 135] Avg delay: 2.604784 s | Avg system energy: 412.1281 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 135/1000 episodes, total num timesteps 40800/300000, FPS 41.
+
+  average reward: -27.3751
+
+  [Episode 140] Avg delay: 2.650039 s | Avg system energy: 410.7418 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 140/1000 episodes, total num timesteps 42300/300000, FPS 41.
+
+  average reward: -31.1818
+
+  [Episode 145] Avg delay: 2.510792 s | Avg system energy: 419.8805 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 145/1000 episodes, total num timesteps 43800/300000, FPS 41.
+
+  average reward: -27.1950
+
+  [Episode 150] Avg delay: 2.562567 s | Avg system energy: 414.5783 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 150/1000 episodes, total num timesteps 45300/300000, FPS 41.
+
+  average reward: -27.5589
+
+  [Episode 155] Avg delay: 2.616156 s | Avg system energy: 409.1758 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 155/1000 episodes, total num timesteps 46800/300000, FPS 41.
+
+  average reward: -25.2873
+
+  [Episode 160] Avg delay: 2.412883 s | Avg system energy: 411.5159 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 160/1000 episodes, total num timesteps 48300/300000, FPS 41.
+
+  average reward: -29.4634
+
+  [Episode 165] Avg delay: 2.604142 s | Avg system energy: 412.3352 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 165/1000 episodes, total num timesteps 49800/300000, FPS 41.
+
+  average reward: -27.4368
+
+  [Episode 170] Avg delay: 2.588138 s | Avg system energy: 409.5124 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 170/1000 episodes, total num timesteps 51300/300000, FPS 41.
+
+  average reward: -25.7665
+
+  [Episode 175] Avg delay: 2.528791 s | Avg system energy: 412.7060 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 175/1000 episodes, total num timesteps 52800/300000, FPS 41.
+
+  average reward: -27.4083
+
+  [Episode 180] Avg delay: 2.479619 s | Avg system energy: 410.4353 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 180/1000 episodes, total num timesteps 54300/300000, FPS 41.
+
+  average reward: -26.0972
+
+  [Episode 185] Avg delay: 2.592876 s | Avg system energy: 419.0266 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 185/1000 episodes, total num timesteps 55800/300000, FPS 41.
+
+  average reward: -28.9613
+
+  [Episode 190] Avg delay: 2.445131 s | Avg system energy: 409.1565 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 190/1000 episodes, total num timesteps 57300/300000, FPS 41.
+
+  average reward: -28.5354
+
+  [Episode 195] Avg delay: 2.462271 s | Avg system energy: 415.3189 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 195/1000 episodes, total num timesteps 58800/300000, FPS 41.
+
+  average reward: -26.6970
+
+  [Episode 200] Avg delay: 2.666545 s | Avg system energy: 417.5700 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 200/1000 episodes, total num timesteps 60300/300000, FPS 41.
+
+  average reward: -27.7046
+
+  [Episode 205] Avg delay: 2.451129 s | Avg system energy: 418.8287 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 205/1000 episodes, total num timesteps 61800/300000, FPS 41.
+
+  average reward: -26.2503
+
+  [Episode 210] Avg delay: 2.517615 s | Avg system energy: 420.0455 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 210/1000 episodes, total num timesteps 63300/300000, FPS 41.
+
+  average reward: -23.8413
+
+  [Episode 215] Avg delay: 2.348627 s | Avg system energy: 415.1030 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 215/1000 episodes, total num timesteps 64800/300000, FPS 41.
+
+  average reward: -24.8065
+
+  [Episode 220] Avg delay: 2.307990 s | Avg system energy: 415.9639 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 220/1000 episodes, total num timesteps 66300/300000, FPS 41.
+
+  average reward: -21.8377
+
+  [Episode 225] Avg delay: 2.467974 s | Avg system energy: 421.2883 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 225/1000 episodes, total num timesteps 67800/300000, FPS 41.
+
+  average reward: -25.2778
+
+  [Episode 230] Avg delay: 2.282507 s | Avg system energy: 415.2525 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 230/1000 episodes, total num timesteps 69300/300000, FPS 41.
+
+  average reward: -21.4377
+
+  [Episode 235] Avg delay: 2.457879 s | Avg system energy: 412.4341 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 235/1000 episodes, total num timesteps 70800/300000, FPS 41.
+
+  average reward: -24.4028
+
+  [Episode 240] Avg delay: 2.385067 s | Avg system energy: 413.8510 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 240/1000 episodes, total num timesteps 72300/300000, FPS 41.
+
+  average reward: -22.8928
+
+  [Episode 245] Avg delay: 2.594166 s | Avg system energy: 416.8204 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 245/1000 episodes, total num timesteps 73800/300000, FPS 42.
+
+  average reward: -23.7328
+
+  [Episode 250] Avg delay: 2.364035 s | Avg system energy: 415.2104 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 250/1000 episodes, total num timesteps 75300/300000, FPS 42.
+
+  average reward: -24.0292
+
+  [Episode 255] Avg delay: 2.395899 s | Avg system energy: 425.5480 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 255/1000 episodes, total num timesteps 76800/300000, FPS 42.
+
+  average reward: -25.9482
+
+  [Episode 260] Avg delay: 2.369156 s | Avg system energy: 422.3928 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 260/1000 episodes, total num timesteps 78300/300000, FPS 42.
+
+  average reward: -23.5825
+
+  [Episode 265] Avg delay: 2.293961 s | Avg system energy: 418.8414 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 265/1000 episodes, total num timesteps 79800/300000, FPS 42.
+
+  average reward: -22.6865
+
+  [Episode 270] Avg delay: 2.342379 s | Avg system energy: 420.1949 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 270/1000 episodes, total num timesteps 81300/300000, FPS 42.
+
+  average reward: -24.6911
+
+  [Episode 275] Avg delay: 2.441919 s | Avg system energy: 413.6430 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 275/1000 episodes, total num timesteps 82800/300000, FPS 42.
+
+  average reward: -23.2447
+
+  [Episode 280] Avg delay: 2.385037 s | Avg system energy: 415.1868 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 280/1000 episodes, total num timesteps 84300/300000, FPS 42.
+
+  average reward: -22.6618
+
+  [Episode 285] Avg delay: 2.349210 s | Avg system energy: 416.5868 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 285/1000 episodes, total num timesteps 85800/300000, FPS 42.
+
+  average reward: -23.2877
+
+  [Episode 290] Avg delay: 2.387159 s | Avg system energy: 416.4076 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 290/1000 episodes, total num timesteps 87300/300000, FPS 42.
+
+  average reward: -23.0950
+
+  [Episode 295] Avg delay: 2.401472 s | Avg system energy: 412.7594 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 295/1000 episodes, total num timesteps 88800/300000, FPS 42.
+
+  average reward: -22.0684
+
+  [Episode 300] Avg delay: 2.405172 s | Avg system energy: 415.7796 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 300/1000 episodes, total num timesteps 90300/300000, FPS 42.
+
+  average reward: -23.2789
+
+  [Episode 305] Avg delay: 2.350859 s | Avg system energy: 413.0099 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 305/1000 episodes, total num timesteps 91800/300000, FPS 42.
+
+  average reward: -22.2572
+
+  [Episode 310] Avg delay: 2.458933 s | Avg system energy: 411.0690 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 310/1000 episodes, total num timesteps 93300/300000, FPS 42.
+
+  average reward: -24.2234
+
+  [Episode 315] Avg delay: 2.327691 s | Avg system energy: 411.5785 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 315/1000 episodes, total num timesteps 94800/300000, FPS 43.
+
+  average reward: -22.4139
+
+  [Episode 320] Avg delay: 2.387732 s | Avg system energy: 416.0045 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 320/1000 episodes, total num timesteps 96300/300000, FPS 43.
+
+  average reward: -22.7239
+
+  [Episode 325] Avg delay: 2.377345 s | Avg system energy: 419.3511 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 325/1000 episodes, total num timesteps 97800/300000, FPS 43.
+
+  average reward: -20.2402
+
+  [Episode 330] Avg delay: 2.470231 s | Avg system energy: 404.4595 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 330/1000 episodes, total num timesteps 99300/300000, FPS 43.
+
+  average reward: -20.4330
+
+  [Episode 335] Avg delay: 2.317902 s | Avg system energy: 407.0403 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 335/1000 episodes, total num timesteps 100800/300000, FPS 43.
+
+  average reward: -20.2641
+
+  [Episode 340] Avg delay: 2.310240 s | Avg system energy: 409.7897 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 340/1000 episodes, total num timesteps 102300/300000, FPS 43.
+
+  average reward: -19.6803
+
+  [Episode 345] Avg delay: 2.340805 s | Avg system energy: 406.7342 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 345/1000 episodes, total num timesteps 103800/300000, FPS 43.
+
+  average reward: -19.4655
+
+  [Episode 350] Avg delay: 2.351096 s | Avg system energy: 409.3544 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 350/1000 episodes, total num timesteps 105300/300000, FPS 43.
+
+  average reward: -19.0110
+
+  [Episode 355] Avg delay: 2.251742 s | Avg system energy: 410.1578 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 355/1000 episodes, total num timesteps 106800/300000, FPS 43.
+
+  average reward: -17.0116
+
+  [Episode 360] Avg delay: 2.362882 s | Avg system energy: 407.3859 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 360/1000 episodes, total num timesteps 108300/300000, FPS 43.
+
+  average reward: -19.6503
+
+  [Episode 365] Avg delay: 2.308684 s | Avg system energy: 405.0585 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 365/1000 episodes, total num timesteps 109800/300000, FPS 43.
+
+  average reward: -19.5511
+
+  [Episode 370] Avg delay: 2.399787 s | Avg system energy: 404.0823 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 370/1000 episodes, total num timesteps 111300/300000, FPS 43.
+
+  average reward: -20.3461
+
+  [Episode 375] Avg delay: 2.406444 s | Avg system energy: 405.3304 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 375/1000 episodes, total num timesteps 112800/300000, FPS 43.
+
+  average reward: -18.3507
+
+  [Episode 380] Avg delay: 2.382646 s | Avg system energy: 405.1926 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 380/1000 episodes, total num timesteps 114300/300000, FPS 43.
+
+  average reward: -18.2576
+
+  [Episode 385] Avg delay: 2.312781 s | Avg system energy: 403.3457 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 385/1000 episodes, total num timesteps 115800/300000, FPS 43.
+
+  average reward: -17.6170
+
+  [Episode 390] Avg delay: 2.514605 s | Avg system energy: 401.0348 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 390/1000 episodes, total num timesteps 117300/300000, FPS 43.
+
+  average reward: -17.7757
+
+  [Episode 395] Avg delay: 2.447885 s | Avg system energy: 407.4967 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 395/1000 episodes, total num timesteps 118800/300000, FPS 43.
+
+  average reward: -18.6157
+
+  [Episode 400] Avg delay: 2.314079 s | Avg system energy: 400.7137 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 400/1000 episodes, total num timesteps 120300/300000, FPS 43.
+
+  average reward: -18.1294
+
+  [Episode 405] Avg delay: 2.295630 s | Avg system energy: 400.3900 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 405/1000 episodes, total num timesteps 121800/300000, FPS 43.
+
+  average reward: -17.0302
+
+  [Episode 410] Avg delay: 2.331363 s | Avg system energy: 402.7563 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 410/1000 episodes, total num timesteps 123300/300000, FPS 43.
+
+  average reward: -17.1917
+
+  [Episode 415] Avg delay: 2.434678 s | Avg system energy: 400.9230 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 415/1000 episodes, total num timesteps 124800/300000, FPS 43.
+
+  average reward: -15.6091
+
+  [Episode 420] Avg delay: 2.382998 s | Avg system energy: 400.4534 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 420/1000 episodes, total num timesteps 126300/300000, FPS 43.
+
+  average reward: -16.1427
+
+  [Episode 425] Avg delay: 2.233625 s | Avg system energy: 402.8068 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 425/1000 episodes, total num timesteps 127800/300000, FPS 43.
+
+  average reward: -16.2830
+
+  [Episode 430] Avg delay: 2.465525 s | Avg system energy: 402.0572 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 430/1000 episodes, total num timesteps 129300/300000, FPS 43.
+
+  average reward: -16.3274
+
+  [Episode 435] Avg delay: 2.366909 s | Avg system energy: 400.4234 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 435/1000 episodes, total num timesteps 130800/300000, FPS 43.
+
+  average reward: -15.1649
+
+  [Episode 440] Avg delay: 2.332468 s | Avg system energy: 403.2049 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 440/1000 episodes, total num timesteps 132300/300000, FPS 43.
+
+  average reward: -16.5450
+
+  [Episode 445] Avg delay: 2.416869 s | Avg system energy: 403.8957 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 445/1000 episodes, total num timesteps 133800/300000, FPS 44.
+
+  average reward: -15.0403
+
+  [Episode 450] Avg delay: 2.388942 s | Avg system energy: 403.9853 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 450/1000 episodes, total num timesteps 135300/300000, FPS 44.
+
+  average reward: -14.5073
+
+  [Episode 455] Avg delay: 2.414950 s | Avg system energy: 405.4417 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 455/1000 episodes, total num timesteps 136800/300000, FPS 44.
+
+  average reward: -14.2131
+
+  [Episode 460] Avg delay: 2.307254 s | Avg system energy: 402.3306 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 460/1000 episodes, total num timesteps 138300/300000, FPS 44.
+
+  average reward: -12.8134
+
+  [Episode 465] Avg delay: 2.386093 s | Avg system energy: 404.0622 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 465/1000 episodes, total num timesteps 139800/300000, FPS 44.
+
+  average reward: -13.5164
+
+  [Episode 470] Avg delay: 2.386686 s | Avg system energy: 403.9734 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 470/1000 episodes, total num timesteps 141300/300000, FPS 44.
+
+  average reward: -13.6536
+
+  [Episode 475] Avg delay: 2.371104 s | Avg system energy: 401.4815 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 475/1000 episodes, total num timesteps 142800/300000, FPS 44.
+
+  average reward: -14.5559
+
+  [Episode 480] Avg delay: 2.277192 s | Avg system energy: 407.7701 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 480/1000 episodes, total num timesteps 144300/300000, FPS 44.
+
+  average reward: -14.8100
+
+  [Episode 485] Avg delay: 2.369556 s | Avg system energy: 401.1404 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 485/1000 episodes, total num timesteps 145800/300000, FPS 44.
+
+  average reward: -14.4472
+
+  [Episode 490] Avg delay: 2.349489 s | Avg system energy: 402.4814 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 490/1000 episodes, total num timesteps 147300/300000, FPS 44.
+
+  average reward: -13.8233
+
+  [Episode 495] Avg delay: 2.455581 s | Avg system energy: 403.2276 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 495/1000 episodes, total num timesteps 148800/300000, FPS 44.
+
+  average reward: -14.4535
+
+  [Episode 500] Avg delay: 2.451890 s | Avg system energy: 404.3634 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 500/1000 episodes, total num timesteps 150300/300000, FPS 44.
+
+  average reward: -14.8421
+
+  [Episode 505] Avg delay: 2.361523 s | Avg system energy: 400.4360 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 505/1000 episodes, total num timesteps 151800/300000, FPS 44.
+
+  average reward: -12.9557
+
+  [Episode 510] Avg delay: 2.467711 s | Avg system energy: 400.8440 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 510/1000 episodes, total num timesteps 153300/300000, FPS 44.
+
+  average reward: -14.1942
+
+  [Episode 515] Avg delay: 2.329504 s | Avg system energy: 403.6462 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 515/1000 episodes, total num timesteps 154800/300000, FPS 44.
+
+  average reward: -12.8172
+
+  [Episode 520] Avg delay: 2.344433 s | Avg system energy: 397.1029 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 520/1000 episodes, total num timesteps 156300/300000, FPS 44.
+
+  average reward: -13.5746
+
+  [Episode 525] Avg delay: 2.283774 s | Avg system energy: 400.0755 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 525/1000 episodes, total num timesteps 157800/300000, FPS 44.
+
+  average reward: -11.8767
+
+  [Episode 530] Avg delay: 2.362150 s | Avg system energy: 396.6916 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 530/1000 episodes, total num timesteps 159300/300000, FPS 44.
+
+  average reward: -13.4795
+
+  [Episode 535] Avg delay: 2.369977 s | Avg system energy: 403.7797 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 535/1000 episodes, total num timesteps 160800/300000, FPS 43.
+
+  average reward: -13.7122
+
+  [Episode 540] Avg delay: 2.343622 s | Avg system energy: 402.2026 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 540/1000 episodes, total num timesteps 162300/300000, FPS 43.
+
+  average reward: -13.0944
+
+  [Episode 545] Avg delay: 2.503317 s | Avg system energy: 401.6972 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 545/1000 episodes, total num timesteps 163800/300000, FPS 43.
+
+  average reward: -12.9219
+
+  [Episode 550] Avg delay: 2.395513 s | Avg system energy: 403.3302 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 550/1000 episodes, total num timesteps 165300/300000, FPS 43.
+
+  average reward: -12.1647
+
+  [Episode 555] Avg delay: 2.355169 s | Avg system energy: 400.1410 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 555/1000 episodes, total num timesteps 166800/300000, FPS 43.
+
+  average reward: -12.5941
+
+  [Episode 560] Avg delay: 2.345025 s | Avg system energy: 401.3485 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 560/1000 episodes, total num timesteps 168300/300000, FPS 43.
+
+  average reward: -12.0762
+
+  [Episode 565] Avg delay: 2.277816 s | Avg system energy: 399.3974 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 565/1000 episodes, total num timesteps 169800/300000, FPS 43.
+
+  average reward: -11.3297
+
+  [Episode 570] Avg delay: 2.404702 s | Avg system energy: 402.0237 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 570/1000 episodes, total num timesteps 171300/300000, FPS 43.
+
+  average reward: -12.1710
+
+  [Episode 575] Avg delay: 2.383446 s | Avg system energy: 403.2033 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 575/1000 episodes, total num timesteps 172800/300000, FPS 43.
+
+  average reward: -13.9867
+
+  [Episode 580] Avg delay: 2.320714 s | Avg system energy: 402.9260 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 580/1000 episodes, total num timesteps 174300/300000, FPS 43.
+
+  average reward: -10.0872
+
+  [Episode 585] Avg delay: 2.457055 s | Avg system energy: 403.9936 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 585/1000 episodes, total num timesteps 175800/300000, FPS 43.
+
+  average reward: -11.2732
+
+  [Episode 590] Avg delay: 2.356635 s | Avg system energy: 400.5666 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 590/1000 episodes, total num timesteps 177300/300000, FPS 43.
+
+  average reward: -12.3285
+
+  [Episode 595] Avg delay: 2.372292 s | Avg system energy: 401.9224 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 595/1000 episodes, total num timesteps 178800/300000, FPS 43.
+
+  average reward: -10.5244
+
+  [Episode 600] Avg delay: 2.383103 s | Avg system energy: 401.9574 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 600/1000 episodes, total num timesteps 180300/300000, FPS 43.
+
+  average reward: -13.0177
+
+  [Episode 605] Avg delay: 2.411418 s | Avg system energy: 400.9565 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 605/1000 episodes, total num timesteps 181800/300000, FPS 43.
+
+  average reward: -10.8949
+
+  [Episode 610] Avg delay: 2.304185 s | Avg system energy: 400.5380 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 610/1000 episodes, total num timesteps 183300/300000, FPS 43.
+
+  average reward: -11.3197
+
+  [Episode 615] Avg delay: 2.329246 s | Avg system energy: 404.5174 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 615/1000 episodes, total num timesteps 184800/300000, FPS 43.
+
+  average reward: -11.1030
+
+  [Episode 620] Avg delay: 2.264379 s | Avg system energy: 404.6463 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 620/1000 episodes, total num timesteps 186300/300000, FPS 43.
+
+  average reward: -10.6862
+
+  [Episode 625] Avg delay: 2.376653 s | Avg system energy: 399.9856 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 625/1000 episodes, total num timesteps 187800/300000, FPS 43.
+
+  average reward: -13.6332
+
+  [Episode 630] Avg delay: 2.371682 s | Avg system energy: 408.4961 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 630/1000 episodes, total num timesteps 189300/300000, FPS 43.
+
+  average reward: -12.0268
+
+  [Episode 635] Avg delay: 2.298947 s | Avg system energy: 405.1538 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 635/1000 episodes, total num timesteps 190800/300000, FPS 43.
+
+  average reward: -11.0094
+
+  [Episode 640] Avg delay: 2.584657 s | Avg system energy: 405.5642 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 640/1000 episodes, total num timesteps 192300/300000, FPS 43.
+
+  average reward: -12.5512
+
+  [Episode 645] Avg delay: 2.398401 s | Avg system energy: 407.2673 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 645/1000 episodes, total num timesteps 193800/300000, FPS 43.
+
+  average reward: -11.8181
+
+  [Episode 650] Avg delay: 2.391301 s | Avg system energy: 406.0294 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 650/1000 episodes, total num timesteps 195300/300000, FPS 43.
+
+  average reward: -11.6043
+
+  [Episode 655] Avg delay: 2.320390 s | Avg system energy: 401.7772 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 655/1000 episodes, total num timesteps 196800/300000, FPS 43.
+
+  average reward: -9.9867
+
+  [Episode 660] Avg delay: 2.414034 s | Avg system energy: 404.3686 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 660/1000 episodes, total num timesteps 198300/300000, FPS 43.
+
+  average reward: -10.5000
+
+  [Episode 665] Avg delay: 2.368447 s | Avg system energy: 404.2797 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 665/1000 episodes, total num timesteps 199800/300000, FPS 43.
+
+  average reward: -13.3663
+
+  [Episode 670] Avg delay: 2.353649 s | Avg system energy: 404.2770 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 670/1000 episodes, total num timesteps 201300/300000, FPS 43.
+
+  average reward: -11.6167
+
+  [Episode 675] Avg delay: 2.408391 s | Avg system energy: 411.8781 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 675/1000 episodes, total num timesteps 202800/300000, FPS 43.
+
+  average reward: -13.3432
+
+  [Episode 680] Avg delay: 2.378581 s | Avg system energy: 405.8605 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 680/1000 episodes, total num timesteps 204300/300000, FPS 43.
+
+  average reward: -12.4293
+
+  [Episode 685] Avg delay: 2.377026 s | Avg system energy: 408.4785 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 685/1000 episodes, total num timesteps 205800/300000, FPS 43.
+
+  average reward: -11.6540
+
+  [Episode 690] Avg delay: 2.365372 s | Avg system energy: 402.9557 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 690/1000 episodes, total num timesteps 207300/300000, FPS 43.
+
+  average reward: -10.8616
+
+  [Episode 695] Avg delay: 2.324418 s | Avg system energy: 409.7937 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 695/1000 episodes, total num timesteps 208800/300000, FPS 43.
+
+  average reward: -10.3589
+
+  [Episode 700] Avg delay: 2.327689 s | Avg system energy: 406.0167 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 700/1000 episodes, total num timesteps 210300/300000, FPS 43.
+
+  average reward: -11.2772
+
+  [Episode 705] Avg delay: 2.318699 s | Avg system energy: 409.5829 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 705/1000 episodes, total num timesteps 211800/300000, FPS 43.
+
+  average reward: -9.6789
+
+  [Episode 710] Avg delay: 2.429956 s | Avg system energy: 404.1012 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 710/1000 episodes, total num timesteps 213300/300000, FPS 43.
+
+  average reward: -12.3440
+
+  [Episode 715] Avg delay: 2.369247 s | Avg system energy: 403.8033 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 715/1000 episodes, total num timesteps 214800/300000, FPS 43.
+
+  average reward: -11.1884
+
+  [Episode 720] Avg delay: 2.349558 s | Avg system energy: 403.0482 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 720/1000 episodes, total num timesteps 216300/300000, FPS 42.
+
+  average reward: -10.5161
+
+  [Episode 725] Avg delay: 2.323539 s | Avg system energy: 408.0289 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 725/1000 episodes, total num timesteps 217800/300000, FPS 42.
+
+  average reward: -10.0488
+
+  [Episode 730] Avg delay: 2.313826 s | Avg system energy: 409.7196 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 730/1000 episodes, total num timesteps 219300/300000, FPS 42.
+
+  average reward: -12.5762
+
+  [Episode 735] Avg delay: 2.480172 s | Avg system energy: 409.3606 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 735/1000 episodes, total num timesteps 220800/300000, FPS 42.
+
+  average reward: -12.3196
+
+  [Episode 740] Avg delay: 2.362844 s | Avg system energy: 408.1351 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 740/1000 episodes, total num timesteps 222300/300000, FPS 42.
+
+  average reward: -10.9281
+
+  [Episode 745] Avg delay: 2.332374 s | Avg system energy: 410.4990 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 745/1000 episodes, total num timesteps 223800/300000, FPS 42.
+
+  average reward: -12.6144
+
+  [Episode 750] Avg delay: 2.384357 s | Avg system energy: 408.3775 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 750/1000 episodes, total num timesteps 225300/300000, FPS 42.
+
+  average reward: -10.8231
+
+  [Episode 755] Avg delay: 2.379581 s | Avg system energy: 404.4431 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 755/1000 episodes, total num timesteps 226800/300000, FPS 42.
+
+  average reward: -12.0062
+
+  [Episode 760] Avg delay: 2.371607 s | Avg system energy: 406.0457 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 760/1000 episodes, total num timesteps 228300/300000, FPS 42.
+
+  average reward: -10.7333
+
+  [Episode 765] Avg delay: 2.386596 s | Avg system energy: 403.1853 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 765/1000 episodes, total num timesteps 229800/300000, FPS 41.
+
+  average reward: -10.4263
+
+  [Episode 770] Avg delay: 2.545963 s | Avg system energy: 407.1062 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 770/1000 episodes, total num timesteps 231300/300000, FPS 41.
+
+  average reward: -12.7167
+
+  [Episode 775] Avg delay: 2.366755 s | Avg system energy: 410.8701 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 775/1000 episodes, total num timesteps 232800/300000, FPS 41.
+
+  average reward: -11.4382
+
+  [Episode 780] Avg delay: 2.382430 s | Avg system energy: 408.9653 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 780/1000 episodes, total num timesteps 234300/300000, FPS 41.
+
+  average reward: -10.7720
+
+  [Episode 785] Avg delay: 2.392165 s | Avg system energy: 408.8516 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 785/1000 episodes, total num timesteps 235800/300000, FPS 41.
+
+  average reward: -11.8056
+
+  [Episode 790] Avg delay: 2.384362 s | Avg system energy: 406.3284 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 790/1000 episodes, total num timesteps 237300/300000, FPS 41.
+
+  average reward: -12.6854
+
+  [Episode 795] Avg delay: 2.354623 s | Avg system energy: 407.9120 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 795/1000 episodes, total num timesteps 238800/300000, FPS 41.
+
+  average reward: -10.5104
+
+  [Episode 800] Avg delay: 2.356877 s | Avg system energy: 413.7225 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 800/1000 episodes, total num timesteps 240300/300000, FPS 41.
+
+  average reward: -11.2892
+
+  [Episode 805] Avg delay: 2.326384 s | Avg system energy: 409.4063 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 805/1000 episodes, total num timesteps 241800/300000, FPS 41.
+
+  average reward: -10.9463
+
+  [Episode 810] Avg delay: 2.346568 s | Avg system energy: 411.6004 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 810/1000 episodes, total num timesteps 243300/300000, FPS 41.
+
+  average reward: -11.4606
+
+  [Episode 815] Avg delay: 2.380528 s | Avg system energy: 409.5017 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 815/1000 episodes, total num timesteps 244800/300000, FPS 41.
+
+  average reward: -11.1277
+
+  [Episode 820] Avg delay: 2.367612 s | Avg system energy: 409.4218 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 820/1000 episodes, total num timesteps 246300/300000, FPS 41.
+
+  average reward: -10.5754
+
+  [Episode 825] Avg delay: 2.589554 s | Avg system energy: 406.3654 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 825/1000 episodes, total num timesteps 247800/300000, FPS 40.
+
+  average reward: -12.5297
+
+  [Episode 830] Avg delay: 2.429281 s | Avg system energy: 409.4109 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 830/1000 episodes, total num timesteps 249300/300000, FPS 40.
+
+  average reward: -9.9935
+
+  [Episode 835] Avg delay: 2.405969 s | Avg system energy: 409.7226 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 835/1000 episodes, total num timesteps 250800/300000, FPS 40.
+
+  average reward: -10.6970
+
+  [Episode 840] Avg delay: 2.429927 s | Avg system energy: 408.4602 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 840/1000 episodes, total num timesteps 252300/300000, FPS 40.
+
+  average reward: -11.8661
+
+  [Episode 845] Avg delay: 2.406079 s | Avg system energy: 408.3324 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 845/1000 episodes, total num timesteps 253800/300000, FPS 40.
+
+  average reward: -11.3317
+
+  [Episode 850] Avg delay: 2.374222 s | Avg system energy: 412.2117 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 850/1000 episodes, total num timesteps 255300/300000, FPS 40.
+
+  average reward: -11.6054
+
+  [Episode 855] Avg delay: 2.408920 s | Avg system energy: 409.9383 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 855/1000 episodes, total num timesteps 256800/300000, FPS 40.
+
+  average reward: -12.5354
+
+  [Episode 860] Avg delay: 2.345345 s | Avg system energy: 413.9643 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 860/1000 episodes, total num timesteps 258300/300000, FPS 40.
+
+  average reward: -11.2847
+
+  [Episode 865] Avg delay: 2.550960 s | Avg system energy: 412.5852 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 865/1000 episodes, total num timesteps 259800/300000, FPS 40.
+
+  average reward: -12.4629
+
+  [Episode 870] Avg delay: 2.282312 s | Avg system energy: 408.2388 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 870/1000 episodes, total num timesteps 261300/300000, FPS 40.
+
+  average reward: -11.7154
+
+  [Episode 875] Avg delay: 2.459516 s | Avg system energy: 408.9017 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 875/1000 episodes, total num timesteps 262800/300000, FPS 40.
+
+  average reward: -12.9344
+
+  [Episode 880] Avg delay: 2.405159 s | Avg system energy: 414.6290 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 880/1000 episodes, total num timesteps 264300/300000, FPS 40.
+
+  average reward: -12.8305
+
+  [Episode 885] Avg delay: 2.343220 s | Avg system energy: 414.2842 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 885/1000 episodes, total num timesteps 265800/300000, FPS 40.
+
+  average reward: -11.7567
+
+  [Episode 890] Avg delay: 2.420920 s | Avg system energy: 412.1529 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 890/1000 episodes, total num timesteps 267300/300000, FPS 40.
+
+  average reward: -11.8406
+
+  [Episode 895] Avg delay: 2.325121 s | Avg system energy: 412.6644 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 895/1000 episodes, total num timesteps 268800/300000, FPS 40.
+
+  average reward: -10.6080
+
+  [Episode 900] Avg delay: 2.479700 s | Avg system energy: 411.2115 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 900/1000 episodes, total num timesteps 270300/300000, FPS 39.
+
+  average reward: -12.6101
+
+  [Episode 905] Avg delay: 2.503638 s | Avg system energy: 411.4653 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 905/1000 episodes, total num timesteps 271800/300000, FPS 39.
+
+  average reward: -11.6481
+
+  [Episode 910] Avg delay: 2.440966 s | Avg system energy: 417.3288 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 910/1000 episodes, total num timesteps 273300/300000, FPS 39.
+
+  average reward: -11.5313
+
+  [Episode 915] Avg delay: 2.337113 s | Avg system energy: 408.7479 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 915/1000 episodes, total num timesteps 274800/300000, FPS 39.
+
+  average reward: -11.6625
+
+  [Episode 920] Avg delay: 2.397727 s | Avg system energy: 408.5909 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 920/1000 episodes, total num timesteps 276300/300000, FPS 39.
+
+  average reward: -11.6535
+
+  [Episode 925] Avg delay: 2.268309 s | Avg system energy: 413.6144 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 925/1000 episodes, total num timesteps 277800/300000, FPS 39.
+
+  average reward: -10.7691
+
+  [Episode 930] Avg delay: 2.386111 s | Avg system energy: 412.6134 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 930/1000 episodes, total num timesteps 279300/300000, FPS 39.
+
+  average reward: -11.1668
+
+  [Episode 935] Avg delay: 2.313111 s | Avg system energy: 413.0893 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 935/1000 episodes, total num timesteps 280800/300000, FPS 39.
+
+  average reward: -11.0585
+
+  [Episode 940] Avg delay: 2.335652 s | Avg system energy: 408.5894 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 940/1000 episodes, total num timesteps 282300/300000, FPS 39.
+
+  average reward: -11.3753
+
+  [Episode 945] Avg delay: 2.367176 s | Avg system energy: 409.6934 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 945/1000 episodes, total num timesteps 283800/300000, FPS 39.
+
+  average reward: -11.9870
+
+  [Episode 950] Avg delay: 2.297758 s | Avg system energy: 409.6090 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 950/1000 episodes, total num timesteps 285300/300000, FPS 39.
+
+  average reward: -11.0542
+
+  [Episode 955] Avg delay: 2.536021 s | Avg system energy: 414.9377 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 955/1000 episodes, total num timesteps 286800/300000, FPS 39.
+
+  average reward: -13.6326
+
+  [Episode 960] Avg delay: 2.350489 s | Avg system energy: 409.0974 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 960/1000 episodes, total num timesteps 288300/300000, FPS 39.
+
+  average reward: -11.0160
+
+  [Episode 965] Avg delay: 2.465049 s | Avg system energy: 412.6575 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 965/1000 episodes, total num timesteps 289800/300000, FPS 39.
+
+  average reward: -10.1758
+
+  [Episode 970] Avg delay: 2.277277 s | Avg system energy: 415.2587 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 970/1000 episodes, total num timesteps 291300/300000, FPS 39.
+
+  average reward: -10.2106
+
+  [Episode 975] Avg delay: 2.454073 s | Avg system energy: 415.3374 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 975/1000 episodes, total num timesteps 292800/300000, FPS 39.
+
+  average reward: -11.8560
+
+  [Episode 980] Avg delay: 2.412506 s | Avg system energy: 411.8274 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 980/1000 episodes, total num timesteps 294300/300000, FPS 39.
+
+  average reward: -12.1840
+
+  [Episode 985] Avg delay: 2.483632 s | Avg system energy: 412.5251 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 985/1000 episodes, total num timesteps 295800/300000, FPS 39.
+
+  average reward: -8.9773
+
+  [Episode 990] Avg delay: 2.399164 s | Avg system energy: 410.7188 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 990/1000 episodes, total num timesteps 297300/300000, FPS 39.
+
+  average reward: -13.7554
+
+  [Episode 995] Avg delay: 2.320254 s | Avg system energy: 409.3327 J
+
+ Scenario UAV_MEC Algo mappo Exp check updates 995/1000 episodes, total num timesteps 298800/300000, FPS 39.
+
+  average reward: -12.5097
