@@ -206,7 +206,7 @@ def get_config():
     parser.add_argument(
         "--num_env_steps",
         type=int,
-        default=60 * 5 * 1000,
+        default=60 * 5 * 2000,
         help="Number of environment steps to train (default: 10e6)",
     )
     parser.add_argument(

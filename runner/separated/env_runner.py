@@ -11,8 +11,9 @@ import matplotlib.pyplot as plt
 
 from utils.util import update_linear_schedule
 from runner.separated.base_runner import Runner
-
-
+import pandas as pd # <=== [新增] 必须导入 pandas
+from envs.Base import Base  # 直接引入你的 Base 配置
+'''_collect_performance_metrics这里面有几个数据是累加的，带cum的'''
 def _t2n(x):
     return x.detach().cpu().numpy()
 
@@ -24,13 +25,17 @@ class EnvRunner(Runner):
         env_core = self.envs.envs[0].env
         self.n_users = env_core.n_users
         self.n_uavs = env_core.n_uavs
+        # [新增] 实例化 Base 以便获取各项权重
+        self.Base = Base()
 
         if not self.use_render:
             self.traj_dir = str(self.run_dir / 'trajectories')
             self.reward_dir = str(self.run_dir / 'reward_details')
+            # [新增] 创建专门存放时延能耗等性能指标的目录
+            self.metrics_dir = str(self.run_dir / 'performance_metrics') 
             os.makedirs(self.traj_dir, exist_ok=True)
             os.makedirs(self.reward_dir, exist_ok=True)
-
+            os.makedirs(self.metrics_dir, exist_ok=True) # [新增]
     def run(self):
         self.warmup()
 
@@ -42,11 +47,29 @@ class EnvRunner(Runner):
                 for agent_id in range(self.num_agents):
                     self.trainer[agent_id].policy.lr_decay(episode, episodes)
 
+            # 基本位置与系统指标记录
             ep_user_pos = [[] for _ in range(self.n_users)]
             ep_uav_pos = [[] for _ in range(self.n_uavs)]
             ep_delays = []
             ep_sys_energies = []
+            
+            # ==========================================
+            # 1. 初始化【奖励详情表】的容器和累计变量
+            # ==========================================
             ep_reward_rows = []
+            sys_cum_reward = 0.0 # 系统的累计大锅饭奖励
+            agent_cum_rewards = np.zeros(self.num_agents) # 每个智能体的累计总分
+            
+            # ==========================================
+            # 2. 初始化【3张性能指标表】的容器和累计变量
+            # ==========================================
+            ep_user_metrics = []
+            ep_uav_metrics = []
+            ep_sys_metrics = []
+            user_cum_energy = np.zeros(self.n_users)
+            sys_cum_time_cost = 0.0
+            sys_cum_energy = 0.0
+            
 
             for step in range(self.episode_length):
                 (
@@ -62,6 +85,8 @@ class EnvRunner(Runner):
 
                 # --- 从第一个环境线程收集指标 ---
                 info_e0 = infos[0]
+                
+                # 记录位置轨迹和基础指标
                 for i in range(self.n_users):
                     ep_user_pos[i].append(info_e0[i]['position'].copy())
                 for j in range(self.n_uavs):
@@ -69,31 +94,58 @@ class EnvRunner(Runner):
                 ep_delays.append(info_e0[0]['avg_user_delay'])
                 ep_sys_energies.append(info_e0[0]['total_system_energy'])
 
-                cum_rewards = np.zeros(self.num_agents)
-                for a in range(self.num_agents):
-                    r_val = info_e0[a]['reward_details']['total']
-                    if step > 0 and len(ep_reward_rows) >= self.num_agents:
-                        prev_cum = ep_reward_rows[-(self.num_agents - a)]['cumulative_reward'] \
-                            if a > 0 else ep_reward_rows[-self.num_agents]['cumulative_reward']
-                    cum_rewards[a] = 0.0
+                # ========================================================
+                # [追加新增] 提取并保存3张表需要的性能数据 (已封装)
+                # ========================================================
+                if episode % 10 == 0:
+                    sys_cum_time_cost, sys_cum_energy = self._collect_performance_metrics(
+                        step, info_e0,
+                        ep_sys_metrics, ep_user_metrics, ep_uav_metrics,
+                        sys_cum_time_cost, sys_cum_energy, user_cum_energy
+                    )
 
-                for a in range(self.num_agents):
-                    rd = info_e0[a]['reward_details']
-                    prev_cum = 0.0
-                    if ep_reward_rows:
-                        for row in reversed(ep_reward_rows):
-                            if row['agent_id'] == a:
-                                prev_cum = row['cumulative_reward']
-                                break
-                    row = {
-                        'step': step,
-                        'agent_id': a,
-                        'agent_type': rd['agent_type'],
-                        'total_reward': rd['total'],
-                        'cumulative_reward': prev_cum + rd['total'],
-                    }
-                    row.update(rd)
-                    ep_reward_rows.append(row)
+                # ========================================================
+                # 记录 B：提取并保存高度拆解的【奖励详情表】数据
+                # ========================================================
+                if episode % 10 == 0:
+                    # 1. 提取本步的系统大锅饭奖励 (全局共享，直接取第0个就行)
+                    step_sys_reward = info_e0[0]['reward_details']['system_reward']
+                    sys_cum_reward += step_sys_reward
+
+                    # 2. 遍历每个智能体，分类提取数据
+                    for a in range(self.num_agents):
+                        rd = info_e0[a]['reward_details']
+                        step_total = rd['total']
+                        agent_cum_rewards[a] += step_total
+                        
+                        # 生成当前步的报表行 (利用 .get() 方法，没有的项自动补 0.0)
+                        row = {
+                            'Step': step,
+                            'Agent_Type': rd['agent_type'].upper(), # 'USER' 或 'UAV'
+                            'Agent_ID': a if a < self.n_users else a - self.n_users,
+                            
+                            # --- 全局共有项 ---
+                            'System_Reward': step_sys_reward,
+                            'System_Cumulative_Reward': sys_cum_reward,
+                            'Agent_Step_Total_Reward': step_total,
+                            'Agent_Cumulative_Reward': agent_cum_rewards[a],
+                            
+                            # --- 用户专属字段 (UAV填0) ---
+                            'w1_System_Reward': rd.get('w1_system', 0.0),
+                            'User_Cost_Penalty': rd.get('neg_w2_cost', 0.0),
+                            'Norm_Delay_Ratio': rd.get('delay_ratio', 0.0),
+                            'Norm_Energy_Ratio': rd.get('energy_ratio', 0.0),
+                            
+                            # --- 无人机专属字段 (User填0) ---
+                            'w_Sys_Part_Reward': rd.get('w_sys_part', 0.0),
+                            'Proximity_Reward': rd.get('proximity_reward', 0.0),
+                            'Coverage_Reward': rd.get('coverage_reward', 0.0),
+                            'Association_Bonus': rd.get('assoc_bonus', 0.0),
+                            'Boundary_Penalty': rd.get('boundary_pen', 0.0),
+                            'Collision_Penalty': rd.get('collision_pen', 0.0)
+                        }
+                        ep_reward_rows.append(row)
+                
 
                 data = (
                     obs, rewards, dones, infos, values, actions,
@@ -117,6 +169,9 @@ class EnvRunner(Runner):
             # --- 每10个轮次: 保存奖励详情表格 ---
             if episode % 10 == 0:
                 self._save_reward_table(episode, ep_reward_rows)
+                # [追加新增] 顺便把新的 3 张性能指标表也存下来
+                self._save_performance_metrics(episode, ep_user_metrics, ep_uav_metrics, ep_sys_metrics)
+                
 
             # save model
             if episode % self.save_interval == 0 or episode == episodes - 1:
@@ -184,8 +239,9 @@ class EnvRunner(Runner):
             pos = np.array(ep_uav_pos[j])
             c = uav_colors[j % len(uav_colors)]
             m = uav_markers[j % len(uav_markers)]
-            ax.plot(pos[:, 0], pos[:, 1], '-', color=c,
-                    linewidth=2.0, alpha=0.8, label=f'UAV {j}')
+            # [核心修改] 加了 marker='.' 和 markersize=6，让轨迹线每个时隙打一个点！
+            ax.plot(pos[:, 0], pos[:, 1], linestyle='-', marker='.', color=c,
+                    linewidth=1.5, markersize=6, alpha=0.8, label=f'UAV {j}')
             ax.plot(pos[0, 0], pos[0, 1], m, color=c, markersize=10)
             ax.plot(pos[-1, 0], pos[-1, 1], '*', color=c, markersize=14)
 
@@ -209,29 +265,104 @@ class EnvRunner(Runner):
               f"Avg delay: {avg_delay:.6f} s | "
               f"Avg system energy: {avg_energy:.4f} J")
 
+    def _save_performance_metrics(self, episode, user_rows, uav_rows, sys_rows):
+        """把性能指标保存为独立的 CSV"""
+        if not user_rows: return
+        pd.DataFrame(user_rows).to_csv(os.path.join(self.metrics_dir, f'ep_{episode}_user_metrics.csv'), index=False)
+        pd.DataFrame(uav_rows).to_csv(os.path.join(self.metrics_dir, f'ep_{episode}_uav_metrics.csv'), index=False)
+        pd.DataFrame(sys_rows).to_csv(os.path.join(self.metrics_dir, f'ep_{episode}_system_metrics.csv'), index=False)
+        print(f"  >>> Saved 3 Performance Tables (User, UAV, Sys) to {self.metrics_dir}")
+
     def _save_reward_table(self, episode, ep_reward_rows):
-        path = os.path.join(self.reward_dir, f'episode_{episode}.csv')
+        """保存高度拆解的奖励详情表 (带中文公式表头)"""
+        path = os.path.join(self.reward_dir, f'episode_{episode}_rewards.csv')
         if not ep_reward_rows:
             return
 
-        all_keys = set()
-        for row in ep_reward_rows:
-            all_keys.update(row.keys())
+        # 1. 第一行的中文公式说明
+        formula_text = (
+            "说明：用户奖励 = 0.4 * 系统奖励 - 0.6 * 个体成本惩罚 (其中 个体成本 = 加权归一化时延 + 加权归一化能耗) | "
+            "无人机奖励 = 0.3 * 系统奖励 + 0.7 * (接近中心 + 覆盖 + 关联接客 - 越界惩罚 - 碰撞惩罚)\n"
+        )
 
-        header = ['step', 'agent_id', 'agent_type', 'total_reward', 'cumulative_reward',
-                  'system_reward', 'neg_total_cost', 'penalty']
-        user_keys = ['w1_system', 'user_cost', 'neg_w2_cost']
-        uav_keys = ['w_sys_part', 'assoc_reward_avg', 'boundary_pen',
-                     'collision_pen', 'uav_individual', 'w_ind_part']
-        header += user_keys + uav_keys
+        # 2. 转为 pandas DataFrame 并控制列的先后顺序
+        df = pd.DataFrame(ep_reward_rows)
+        cols_order = [
+            'Step', 'Agent_Type', 'Agent_ID', 
+            'System_Reward', 'System_Cumulative_Reward', 
+            'Agent_Step_Total_Reward', 'Agent_Cumulative_Reward',
+            'w1_System_Reward', 'User_Cost_Penalty', 'Norm_Delay_Ratio', 'Norm_Energy_Ratio', 
+            'w_Sys_Part_Reward', 'Proximity_Reward', 'Coverage_Reward', 'Association_Bonus', 'Boundary_Penalty', 'Collision_Penalty'
+        ]
+        df = df[cols_order]
 
-        with open(path, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=header, extrasaction='ignore')
-            writer.writeheader()
-            for row in ep_reward_rows:
-                out = {k: '' for k in header}
-                out.update({k: v for k, v in row.items() if k in header})
-                writer.writerow(out)
+        # 3. 写入文件 (使用 utf-8-sig 确保 Excel 打开中文不乱码)
+        with open(path, 'w', encoding='utf-8-sig') as f:
+            f.write(formula_text)         
+            df.to_csv(f, index=False)
+        print(f"  >>> Saved Reward Details Table to {self.reward_dir}")
+
+    def _collect_performance_metrics(self, step, info_e0, 
+                                     ep_sys_metrics, ep_user_metrics, ep_uav_metrics,
+                                     sys_cum_time_cost, sys_cum_energy, user_cum_energy):
+        """提取并保存3张表需要的性能数据 (系统、用户、无人机)"""
+        # 1. 记录系统级数据 (对应 Eq.28 的目标函数)
+        sys_step_time = info_e0[0].get('sys_time_cost', 0.0)
+        sys_step_eng = info_e0[0]['total_system_energy']
+        sys_cum_time_cost += sys_step_time
+        sys_cum_energy += sys_step_eng
+        
+        w_L = self.Base.mu_L
+        w_E = self.Base.mu_E
+        obj_val = w_L * sys_step_time + w_E * sys_step_eng
+        
+        ep_sys_metrics.append({
+            'Step': step,
+            'Sys_Time_Cost': sys_step_time,
+            'Sys_Energy_J': sys_step_eng,
+            'Cum_Sys_Time_Cost': sys_cum_time_cost,
+            'Cum_Sys_Energy_J': sys_cum_energy,
+            'Objective_Value_Cost': obj_val,
+            'mu_L': w_L,
+            'mu_E': w_E
+        })
+
+        # 2. 记录 User 级数据
+        for i in range(self.n_users):
+            eng = info_e0[i]['energy']
+            user_cum_energy[i] += eng
+            assoc_id = info_e0[i].get('association', 0)
+            assoc_str = "Local" if assoc_id == 0 else f"UAV_{assoc_id-1}"
+            
+            ep_user_metrics.append({
+                'Step': step,
+                'User_ID': i,
+                'Latency_s': info_e0[i]['delay'],
+                'Association': assoc_str,
+                'Offload_Ratio': info_e0[i].get('offload_ratio', 0.0),
+                'Allocated_Freq_Hz': info_e0[i].get('alloc_freq', 0.0), # <=== 完美接住并存入表格！
+                'Energy_J': eng,
+                'Cum_Energy_J': user_cum_energy[i]
+            })
+
+        # 3. 记录 UAV 级数据
+        for j in range(self.n_uavs):
+            idx = self.n_users + j
+            f_eng = info_e0[idx]['fly_energy']
+            c_eng = info_e0[idx]['comp_energy']
+            ep_uav_metrics.append({
+                'Step': step,
+                'UAV_ID': j,
+                'Pos_X': info_e0[idx]['position'][0],
+                'Pos_Y': info_e0[idx]['position'][1],
+                'Fly_Energy_J': f_eng,
+                'Comp_Energy_J': c_eng,
+                'Total_Energy_J': f_eng + c_eng,
+                'Cum_Energy_J': info_e0[idx]['cumulative_energy']
+            })
+            
+        # 必须返回这两个标量累计值，以便外部更新
+        return sys_cum_time_cost, sys_cum_energy
 
     def warmup(self):
         # reset env

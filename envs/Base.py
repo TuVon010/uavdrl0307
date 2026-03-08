@@ -79,7 +79,8 @@ class Base:
         # 6. 任务生成
         # =========================
         self.task_size_min = 1e6  
-        self.task_size_max = 5e6
+        #self.task_size_max = 5e6
+        self.task_size_max = 2e6
         self.cycles_min = 500
         self.cycles_max = 1000
         self.latency_max = 3.0
@@ -97,7 +98,7 @@ class Base:
         # 8. RL 奖励权重
         # =========================
         self.w_penalty = 2.0       # 超时惩罚权重
-        self.w_guide = 0.5        # 无人机越界惩罚
+        self.w_overboundary = 0.5        # 无人机越界惩罚
         self.w_collision = 1.0     # 无人机碰撞惩罚
 
         self.w1_user = 0.4         # 用户奖励中系统奖励权重
@@ -105,8 +106,11 @@ class Base:
         self.w_sys_uav = 0.3       # 无人机奖励中系统奖励权重
         self.w_ind_uav = 0.7       # 无人机奖励中个体奖励权重
 
-        self.w_proximity = 2.0     # 无人机接近用户的奖励权重
-        self.w_coverage = 1.5      # 无人机覆盖用户的奖励权重
+        # self.w_proximity = 2.0     # 无人机接近用户的奖励权重
+        # self.w_coverage = 1.5      # 无人机覆盖用户的奖励权重
+        self.w_proximity = 0.5     # 无人机接近用户的奖励权重
+        #self.w_coverage = 0.5      # 无人机覆盖用户的奖励权重
+        self.w_coverage = 0      # 无人机覆盖用户的奖励权重
 
         # =========================
         # 9. 安全约束

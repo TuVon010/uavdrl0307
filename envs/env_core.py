@@ -168,9 +168,11 @@ class EnvCore(object):
         done = self.current_step >= self.max_steps
         dones = [done] * self.agent_num
 
+        # [修改这里] 传入 user_ratios 和 user_assocs
         infos = self._build_infos(
             user_delays, user_energies, deadline_violations,
-            uav_fly_energies, uav_comp_energies, reward_details)
+            uav_fly_energies, uav_comp_energies, reward_details,
+            user_ratios, user_assocs,uav_freqs)
 
         return [obs_list, rewards, dones, infos]
 
@@ -379,7 +381,7 @@ class EnvCore(object):
                 pos[0] - b.field_X[0], b.field_X[1] - pos[0],
                 pos[1] - b.field_Y[0], b.field_Y[1] - pos[1])
             if dist_to_edge < b.boundary_warn:
-                boundary_pen = b.w_guide * (b.boundary_warn - dist_to_edge) / b.boundary_warn
+                boundary_pen = b.w_overboundary * (b.boundary_warn - dist_to_edge) / b.boundary_warn
 
             # (e) 碰撞惩罚
             collision_pen = 0.0
@@ -417,12 +419,26 @@ class EnvCore(object):
     # 辅助
     # =========================================================
     def _build_infos(self, user_delays, user_energies, violations,
-                     uav_fly_e, uav_comp_e, reward_details):
+                     uav_fly_e, uav_comp_e, reward_details, user_ratios, user_assocs, uav_freqs): # <=== 接收 uav_freqs
         total_sys_energy = float(np.sum(user_energies) + np.sum(uav_fly_e + uav_comp_e))
         avg_delay = float(np.mean(user_delays))
+        
+        # [核心新增] 计算系统总时间成本 (考虑高低优先级的加权时延)
+        sys_time_cost = 0.0
+        for i in range(self.n_users):
+            omega = self.base.omega_H if self.users[i]['priority'] == 1 else self.base.omega_L
+            sys_time_cost += omega * user_delays[i]
 
         infos = []
         for i in range(self.n_users):
+            # [核心新增] 提取无人机给该用户分配的算力
+            assoc = user_assocs[i]
+            if assoc > 0:
+                uav_idx = assoc - 1
+                alloc_f = max(uav_freqs[uav_idx][i], 1e3) # 对应你底层的计算
+            else:
+                alloc_f = 0.0 # 如果是在本地计算，无人机分配的频率就是0
+                
             infos.append({
                 'delay': float(user_delays[i]),
                 'energy': float(user_energies[i]),
@@ -430,7 +446,11 @@ class EnvCore(object):
                 'position': self.users[i]['position'].copy(),
                 'reward_details': reward_details[i],
                 'total_system_energy': total_sys_energy,
+                'sys_time_cost': float(sys_time_cost), # 新增系统时间成本
                 'avg_user_delay': avg_delay,
+                'offload_ratio': float(user_ratios[i]), # 新增卸载比
+                'association': int(user_assocs[i]),     # 新增关联对象
+                'alloc_freq': float(alloc_f), # <=== 新增：将分配的频率打包传出！
             })
         for j in range(self.n_uavs):
             infos.append({
@@ -440,6 +460,7 @@ class EnvCore(object):
                 'position': self.uavs[j]['position'].copy(),
                 'reward_details': reward_details[self.n_users + j],
                 'total_system_energy': total_sys_energy,
+                'sys_time_cost': float(sys_time_cost),
                 'avg_user_delay': avg_delay,
             })
         return infos
