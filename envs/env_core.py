@@ -294,7 +294,7 @@ class EnvCore(object):
                 uav_fly_energies, deadline_violations)
 
     # =========================================================
-    # 奖励计算
+    # 奖励计算  (论文目标: min 总成本 = μ_L·时延 + μ_E·能耗)
     # =========================================================
     def _compute_rewards(self, user_delays, user_energies, violations,
                          uav_fly_e, uav_comp_e, users_per_uav):
@@ -302,13 +302,17 @@ class EnvCore(object):
 
         # ---- 1. 全本地计算基线 (作为参照, 衡量卸载是否有收益) ----
         baseline_delay_costs = []
+        baseline_user_energies = []
         for i in range(self.n_users):
             D = self.tasks[i]['data_size']
             C = self.tasks[i]['cpu_cycles']
             omega = b.omega_H if self.users[i]['priority'] == 1 else b.omega_L
             T_base = D * C / b.C_local
+            E_base = b.k_local * (b.C_local ** 2) * D * C
             baseline_delay_costs.append(omega * T_base / b.latency_max)
+            baseline_user_energies.append(E_base)
         avg_baseline_delay = float(np.mean(baseline_delay_costs))
+        avg_baseline_energy = float(np.mean(baseline_user_energies) / b.norm_energy_user)
 
         # ---- 2. 实际时延成本 (cap 防止极端值) ----
         actual_delay_costs = np.zeros(self.n_users)
@@ -318,21 +322,27 @@ class EnvCore(object):
             actual_delay_costs[i] = omega * capped_delay / b.latency_max
         avg_actual_delay = float(np.mean(actual_delay_costs))
 
-        # ---- 3. 系统奖励 = 时延节省率 - 违约惩罚 ----
+        # ---- 3. 实际能耗成本 (用户+UAV, 归一化) ----
+        avg_user_energy = float(np.mean(user_energies) / b.norm_energy_user)
+        avg_uav_energy = float(np.mean(uav_fly_e + uav_comp_e) / b.norm_energy_uav)
+        actual_energy_cost = avg_user_energy + avg_uav_energy
+
+        # ---- 4. 系统奖励 = 时延节省 - 能耗成本 - 违约惩罚 ----
         delay_saving = (avg_baseline_delay - avg_actual_delay) / max(avg_baseline_delay, 1e-6)
+        energy_penalty = b.mu_E * (actual_energy_cost - avg_baseline_energy)
         violation_rate = float(np.mean(violations))
-        system_reward = delay_saving - b.w_penalty * violation_rate
+        system_reward = delay_saving - energy_penalty - b.w_penalty * violation_rate
 
         rewards = []
         reward_details = []
 
-        # ---- 4. 用户奖励: w1*系统奖励 - w2*个体成本 ----
+        # ---- 5. 用户奖励: w1*系统奖励 - w2*个体成本(时延+能耗) ----
         user_rewards_raw = []
         for i in range(self.n_users):
             omega = b.omega_H if self.users[i]['priority'] == 1 else b.omega_L
             delay_ratio = min(user_delays[i] / b.latency_max, 5.0)
             energy_ratio = min(user_energies[i] / b.norm_energy_user, 5.0)
-            user_cost = omega * (delay_ratio + energy_ratio)
+            user_cost = omega * (b.mu_L * delay_ratio + b.mu_E * energy_ratio)
 
             w1_sys = b.w1_user * system_reward
             neg_w2_cost = -b.w2_user * user_cost
@@ -343,6 +353,7 @@ class EnvCore(object):
                 'agent_type': 'user',
                 'system_reward': float(system_reward),
                 'delay_saving': float(delay_saving),
+                'energy_penalty': float(energy_penalty),
                 'violation_rate': violation_rate,
                 'w1_system': float(w1_sys),
                 'user_cost': float(user_cost),
@@ -375,6 +386,10 @@ class EnvCore(object):
             n_assoc = len(users_per_uav[j])
             assoc_bonus = n_assoc / self.n_users
 
+            # (d) 能耗惩罚 (飞行+计算, 激励低速节能飞行)
+            uav_total_e = uav_fly_e[j] + uav_comp_e[j]
+            energy_pen = b.w_energy_uav * uav_total_e / b.norm_energy_uav
+
             # (d) 越界惩罚
             boundary_pen = 0.0
             dist_to_edge = min(
@@ -391,8 +406,8 @@ class EnvCore(object):
                     if d < b.uav_safe_dist:
                         collision_pen += b.w_collision * (b.uav_safe_dist - d) / b.uav_safe_dist
 
-            uav_individual = (proximity_reward + coverage_reward
-                              + assoc_bonus - boundary_pen - collision_pen)
+            uav_individual = (proximity_reward + coverage_reward + assoc_bonus
+                              - energy_pen - boundary_pen - collision_pen)
 
             w_sys_part = b.w_sys_uav * system_reward
             w_ind_part = b.w_ind_uav * uav_individual
@@ -402,10 +417,12 @@ class EnvCore(object):
                 'agent_type': 'uav',
                 'system_reward': float(system_reward),
                 'delay_saving': float(delay_saving),
+                'energy_penalty_sys': float(energy_penalty),
                 'w_sys_part': float(w_sys_part),
                 'proximity_reward': float(proximity_reward),
                 'coverage_reward': float(coverage_reward),
                 'assoc_bonus': float(assoc_bonus),
+                'energy_pen': float(energy_pen),
                 'boundary_pen': float(boundary_pen),
                 'collision_pen': float(collision_pen),
                 'uav_individual': float(uav_individual),

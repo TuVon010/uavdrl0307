@@ -142,6 +142,7 @@ class EnvRunner(Runner):
                             'Coverage_Reward': rd.get('coverage_reward', 0.0),
                             'Association_Bonus': rd.get('assoc_bonus', 0.0),
                             'Boundary_Penalty': rd.get('boundary_pen', 0.0),
+                            'UAV_Energy_Penalty': rd.get('energy_pen', 0.0) ,# <=== 接住无人机能耗惩罚
                             'Collision_Penalty': rd.get('collision_pen', 0.0)
                         }
                         ep_reward_rows.append(row)
@@ -292,7 +293,7 @@ class EnvRunner(Runner):
             'System_Reward', 'System_Cumulative_Reward', 
             'Agent_Step_Total_Reward', 'Agent_Cumulative_Reward',
             'w1_System_Reward', 'User_Cost_Penalty', 'Norm_Delay_Ratio', 'Norm_Energy_Ratio', 
-            'w_Sys_Part_Reward', 'Proximity_Reward', 'Coverage_Reward', 'Association_Bonus', 'Boundary_Penalty', 'Collision_Penalty'
+            'w_Sys_Part_Reward', 'Proximity_Reward', 'Coverage_Reward', 'Association_Bonus', 'Boundary_Penalty', 'Collision_Penalty','UAV_Energy_Penalty'
         ]
         df = df[cols_order]
 

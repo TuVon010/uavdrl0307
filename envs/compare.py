@@ -1,254 +1,467 @@
-def run(self):
-        self.warmup()
+import numpy as np
+from envs.Base import Base
+from envs.physics_engine import PhysicsEngine
 
-        start = time.time()
-        episodes = int(self.num_env_steps) // self.episode_length // self.n_rollout_threads
 
-        for episode in range(episodes):
-            if self.use_linear_lr_decay:
-                for agent_id in range(self.num_agents):
-                    self.trainer[agent_id].policy.lr_decay(episode, episodes)
+class EnvCore(object):
+    """
+    UAV辅助医疗IoT任务卸载多智能体环境
+    智能体: n_users个用户 + n_uavs个无人机
+    用户动作: [卸载比例, 关联服务器logits(local + M个UAV)]
+    无人机动作: [速度, 方向, 对每个用户的算力分配]
+    """
 
-            # 基本位置与系统指标记录
-            ep_user_pos = [[] for _ in range(self.n_users)]
-            ep_uav_pos = [[] for _ in range(self.n_uavs)]
-            ep_delays = []
-            ep_sys_energies = []
-            
-            # ==========================================
-            # 1. 初始化【奖励详情表】的容器和累计变量
-            # ==========================================
-            ep_reward_rows = []
-            sys_cum_reward = 0.0 # 系统的累计大锅饭奖励
-            agent_cum_rewards = np.zeros(self.num_agents) # 每个智能体的累计总分
-            
-            # ==========================================
-            # 2. 初始化【3张性能指标表】的容器和累计变量
-            # ==========================================
-            ep_user_metrics = []
-            ep_uav_metrics = []
-            ep_sys_metrics = []
-            user_cum_energy = np.zeros(self.n_users)
-            sys_cum_time_cost = 0.0
-            sys_cum_energy = 0.0
+    def __init__(self):
+        self.base = Base()
+        self.physics = PhysicsEngine(self.base)
 
-            for step in range(self.episode_length):
-                (
-                    values, actions, action_log_probs,
-                    rnn_states, rnn_states_critic, actions_env,
-                ) = self.collect(step)
+        self.n_users = self.base.n_users
+        self.n_uavs = self.base.n_uavs
+        self.agent_num = self.n_users + self.n_uavs
 
-                obs, rewards, dones, infos = self.envs.step(actions_env)
+        # 统一观测维度 (所有智能体相同, 便于框架处理)
+        # all_user_pos(2*U) + all_uav_pos(2*M) + own_energy(1)
+        # + all_task_sizes(U) + all_task_cycles(U) + agent_type(1) + agent_id(1)
+        self.obs_dim = (2 * self.n_users + 2 * self.n_uavs
+                        + 1 + self.n_users + self.n_users + 1 + 1)
 
-                # --- 从第一个环境线程收集指标 ---
-                info_e0 = infos[0]
-                
-                # 记录位置轨迹和基础指标
-                for i in range(self.n_users):
-                    ep_user_pos[i].append(info_e0[i]['position'].copy())
-                for j in range(self.n_uavs):
-                    ep_uav_pos[j].append(info_e0[self.n_users + j]['position'].copy())
-                ep_delays.append(info_e0[0]['avg_user_delay'])
-                ep_sys_energies.append(info_e0[0]['total_system_energy'])
+        # 异构动作维度
+        # 用户: ratio(1) + assoc_logits(1+M) = 1 + 1 + n_uavs
+        self.user_action_dim = 1 + 1 + self.n_uavs
+        # 无人机: speed(1) + direction(1) + freq_per_user(U) = 2 + n_users
+        self.uav_action_dim = 2 + self.n_users
+        self.action_dims = ([self.user_action_dim] * self.n_users
+                            + [self.uav_action_dim] * self.n_uavs)
 
-                # ========================================================
-                # 记录 A：提取并保存 3张【性能指标表】需要的数据
-                # ========================================================
-                if episode % 10 == 0:
-                    sys_cum_time_cost, sys_cum_energy = self._collect_performance_metrics(
-                        step, info_e0,
-                        ep_sys_metrics, ep_user_metrics, ep_uav_metrics,
-                        sys_cum_time_cost, sys_cum_energy, user_cum_energy
-                    )
+        self.max_steps = 60
+        self.current_step = 0
 
-                # ========================================================
-                # 记录 B：提取并保存高度拆解的【奖励详情表】数据
-                # ========================================================
-                if episode % 10 == 0:
-                    # 1. 提取本步的系统大锅饭奖励 (全局共享，直接取第0个就行)
-                    step_sys_reward = info_e0[0]['reward_details']['system_reward']
-                    sys_cum_reward += step_sys_reward
+        self.users = None
+        self.uavs = None
+        self.tasks = None
 
-                    # 2. 遍历每个智能体，分类提取数据
-                    for a in range(self.num_agents):
-                        rd = info_e0[a]['reward_details']
-                        step_total = rd['total']
-                        agent_cum_rewards[a] += step_total
-                        
-                        # 生成当前步的报表行 (利用 .get() 方法，没有的项自动补 0.0)
-                        row = {
-                            'Step': step,
-                            'Agent_Type': rd['agent_type'].upper(), # 'USER' 或 'UAV'
-                            'Agent_ID': a if a < self.n_users else a - self.n_users,
-                            
-                            # --- 全局共有项 ---
-                            'System_Reward': step_sys_reward,
-                            'System_Cumulative_Reward': sys_cum_reward,
-                            'Agent_Step_Total_Reward': step_total,
-                            'Agent_Cumulative_Reward': agent_cum_rewards[a],
-                            
-                            # --- 用户专属字段 (UAV填0) ---
-                            'w1_System_Reward': rd.get('w1_system', 0.0),
-                            'User_Cost_Penalty': rd.get('neg_w2_cost', 0.0),
-                            'Norm_Delay_Ratio': rd.get('delay_ratio', 0.0),
-                            'Norm_Energy_Ratio': rd.get('energy_ratio', 0.0),
-                            
-                            # --- 无人机专属字段 (User填0) ---
-                            'w_Sys_Part_Reward': rd.get('w_sys_part', 0.0),
-                            'Proximity_Reward': rd.get('proximity_reward', 0.0),
-                            'Coverage_Reward': rd.get('coverage_reward', 0.0),
-                            'Association_Bonus': rd.get('assoc_bonus', 0.0),
-                            'Boundary_Penalty': rd.get('boundary_pen', 0.0),
-                            'Collision_Penalty': rd.get('collision_pen', 0.0)
-                        }
-                        ep_reward_rows.append(row)
+    # =========================================================
+    # 初始化
+    # =========================================================
+    def reset(self):
+        self.current_step = 0
+        self._init_users()
+        self._init_uavs()
+        self._generate_tasks()
+        return self._get_obs()
 
-                # Buffer 插入和网络更新
-                data = (obs, rewards, dones, infos, values, actions,
-                        action_log_probs, rnn_states, rnn_states_critic)
-                self.insert(data)
-
-            # compute return and update network
-            self.compute()
-            train_infos = self.train()
-
-            total_num_steps = (episode + 1) * self.episode_length * self.n_rollout_threads
-
-            # --- 每个轮次: 保存轨迹图 ---
-            self._save_trajectory(episode, ep_user_pos, ep_uav_pos)
-
-            # --- 每5个轮次: 打印平均时延和平均能耗 ---
-            if episode % 5 == 0:
-                self._print_episode_metrics(episode, ep_delays, ep_sys_energies)
-
-            # --- 每10个轮次: 保存所有的表格 ---
-            if episode % 10 == 0:
-                self._save_reward_table(episode, ep_reward_rows)
-                self._save_performance_metrics(episode, ep_user_metrics, ep_uav_metrics, ep_sys_metrics)
-
-            # save model
-            if episode % self.save_interval == 0 or episode == episodes - 1:
-                self.save()
-
-            # log information (原有代码保持不变)
-            if episode % self.log_interval == 0:
-                end = time.time()
-                print("\n Scenario {} Algo {} Exp {} updates {}/{} episodes, total num timesteps {}/{}, FPS {}.".format(
-                        self.all_args.scenario_name, self.algorithm_name, self.experiment_name, episode, episodes,
-                        total_num_steps, self.num_env_steps, int(total_num_steps / (end - start))))
-
-                if self.env_name == "MPE":
-                    pass # 根据你原代码，这里有 MPE 的逻辑
-                else:
-                    for agent_id in range(self.num_agents):
-                        avg_rew = np.mean(self.buffer[agent_id].rewards) * self.episode_length
-                        train_infos[agent_id].update({"average_episode_rewards": avg_rew})
-                    avg_all = np.mean([np.mean(self.buffer[a].rewards) for a in range(self.num_agents)])
-                    print("  average reward: {:.4f}".format(avg_all * self.episode_length))
-
-                self.log_train(train_infos, total_num_steps)
-
-            # eval
-            if episode % self.eval_interval == 0 and self.use_eval:
-                self.eval(total_num_steps)
-
-    # =================================================================
-    # 数据收集与表格保存方法 (直接跟在 run 后面)
-    # =================================================================
-    def _collect_performance_metrics(self, step, info_e0, 
-                                     ep_sys_metrics, ep_user_metrics, ep_uav_metrics,
-                                     sys_cum_time_cost, sys_cum_energy, user_cum_energy):
-        """提取并保存 3 张性能表 (系统、用户、无人机)"""
-        # 1. 记录系统级数据
-        sys_step_time = info_e0[0].get('sys_time_cost', 0.0)
-        sys_step_eng = info_e0[0]['total_system_energy']
-        sys_cum_time_cost += sys_step_time
-        sys_cum_energy += sys_step_eng
-        
-        w_L = self.base_config.mu_L  # 确保你的 __init__ 里实例化了 self.base_config = Base()
-        w_E = self.base_config.mu_E
-        obj_val = w_L * sys_step_time + w_E * sys_step_eng
-        
-        ep_sys_metrics.append({
-            'Step': step,
-            'Sys_Time_Cost': sys_step_time,
-            'Sys_Energy_J': sys_step_eng,
-            'Cum_Sys_Time_Cost': sys_cum_time_cost,
-            'Cum_Sys_Energy_J': sys_cum_energy,
-            'Objective_Value_Cost': obj_val,
-            'mu_L_Weight': w_L,
-            'mu_E_Weight': w_E
-        })
-
-        # 2. 记录 User 级数据
-        for i in range(self.n_users):
-            eng = info_e0[i]['energy']
-            user_cum_energy[i] += eng
-            assoc_id = info_e0[i].get('association', 0)
-            assoc_str = "Local" if assoc_id == 0 else f"UAV_{assoc_id-1}"
-            
-            ep_user_metrics.append({
-                'Step': step,
-                'User_ID': i,
-                'Latency_s': info_e0[i]['delay'],
-                'Association': assoc_str,
-                'Offload_Ratio': info_e0[i].get('offload_ratio', 0.0),
-                'Allocated_Freq_Hz': info_e0[i].get('alloc_freq', 0.0), 
-                'Energy_J': eng,
-                'Cum_Energy_J': user_cum_energy[i]
+    def _init_users(self):
+        self.users = []
+        cx = (self.base.field_X[0] + self.base.field_X[1]) / 2
+        cy = (self.base.field_Y[0] + self.base.field_Y[1]) / 2
+        spread = self.base.user_cluster_radius
+        for _ in range(self.n_users):
+            x = np.clip(np.random.normal(cx, spread),
+                        self.base.field_X[0], self.base.field_X[1])
+            y = np.clip(np.random.normal(cy, spread),
+                        self.base.field_Y[0], self.base.field_Y[1])
+            self.users.append({
+                'position': np.array([x, y]),
+                'velocity': np.random.uniform(0.0, self.base.user_mean_velocity * 2),
+                'direction': np.random.uniform(0, 2 * np.pi),
+                'energy': 0.0,
+                'priority': np.random.choice([0, 1], p=[0.8, 0.2]),
             })
 
-        # 3. 记录 UAV 级数据
+    def _init_uavs(self):
+        self.uavs = []
+        cx = (self.base.field_X[0] + self.base.field_X[1]) / 2
+        cy = (self.base.field_Y[0] + self.base.field_Y[1]) / 2
+        r = self.base.uav_init_radius
         for j in range(self.n_uavs):
-            idx = self.n_users + j
-            f_eng = info_e0[idx]['fly_energy']
-            c_eng = info_e0[idx]['comp_energy']
-            ep_uav_metrics.append({
-                'Step': step,
-                'UAV_ID': j,
-                'Pos_X': info_e0[idx]['position'][0],
-                'Pos_Y': info_e0[idx]['position'][1],
-                'Fly_Energy_J': f_eng,
-                'Comp_Energy_J': c_eng,
-                'Total_Energy_J': f_eng + c_eng,
-                'Cum_Energy_J': info_e0[idx]['cumulative_energy']
+            angle = 2 * np.pi * j / self.n_uavs + np.pi / 2
+            ux = np.clip(cx + r * np.cos(angle),
+                         self.base.field_X[0], self.base.field_X[1])
+            uy = np.clip(cy + r * np.sin(angle),
+                         self.base.field_Y[0], self.base.field_Y[1])
+            self.uavs.append({
+                'position': np.array([ux, uy]),
+                'energy': 0.0,
+                'cumulative_energy': 0.0,
             })
-            
-        return sys_cum_time_cost, sys_cum_energy
 
-    def _save_performance_metrics(self, episode, user_rows, uav_rows, sys_rows):
-        """把性能指标保存为独立的 CSV"""
-        if not user_rows: return
-        pd.DataFrame(user_rows).to_csv(os.path.join(self.metrics_dir, f'ep_{episode}_user_metrics.csv'), index=False)
-        pd.DataFrame(uav_rows).to_csv(os.path.join(self.metrics_dir, f'ep_{episode}_uav_metrics.csv'), index=False)
-        pd.DataFrame(sys_rows).to_csv(os.path.join(self.metrics_dir, f'ep_{episode}_system_metrics.csv'), index=False)
-        print(f"  >>> Saved 3 Performance Tables (User, UAV, Sys) to {self.metrics_dir}")
+    def _generate_tasks(self):
+        self.tasks = []
+        for _ in range(self.n_users):
+            self.tasks.append({
+                'data_size': np.random.uniform(
+                    self.base.task_size_min, self.base.task_size_max),
+                'cpu_cycles': np.random.uniform(
+                    self.base.cycles_min, self.base.cycles_max),
+                'deadline': self.base.latency_max,
+            })
 
-    def _save_reward_table(self, episode, ep_reward_rows):
-        """保存高度拆解的奖励详情表 (带中文公式表头)"""
-        path = os.path.join(self.reward_dir, f'episode_{episode}_rewards.csv')
-        if not ep_reward_rows:
-            return
+    # =========================================================
+    # 观测构建
+    # =========================================================
+    def _get_obs(self):
+        user_pos = np.array([u['position'] for u in self.users]).flatten() / self.base.norm_pos
+        uav_pos = np.array([u['position'] for u in self.uavs]).flatten() / self.base.norm_pos
+        task_sizes = np.array([t['data_size'] for t in self.tasks]) / self.base.norm_data
+        task_cycles = np.array([t['cpu_cycles'] for t in self.tasks]) / self.base.norm_cycle
 
-        # 1. 第一行的中文公式说明
-        formula_text = (
-            "说明：用户奖励 = 0.4 * 系统奖励 - 0.6 * 个体成本惩罚 (其中 个体成本 = 加权归一化时延 + 加权归一化能耗) | "
-            "无人机奖励 = 0.3 * 系统奖励 + 0.7 * (接近中心 + 覆盖 + 关联接客 - 越界惩罚 - 碰撞惩罚)\n"
-        )
+        obs_list = []
+        for i in range(self.n_users):
+            obs = np.concatenate([
+                user_pos,
+                uav_pos,
+                [self.users[i]['energy'] / self.base.norm_energy_user],
+                task_sizes,
+                task_cycles,
+                [0.0],
+                [i / self.agent_num],
+            ]).astype(np.float32)
+            obs_list.append(obs)
 
-        # 2. 转为 pandas DataFrame 并控制列的先后顺序
-        df = pd.DataFrame(ep_reward_rows)
-        cols_order = [
-            'Step', 'Agent_Type', 'Agent_ID', 
-            'System_Reward', 'System_Cumulative_Reward', 
-            'Agent_Step_Total_Reward', 'Agent_Cumulative_Reward',
-            'w1_System_Reward', 'User_Cost_Penalty', 'Norm_Delay_Ratio', 'Norm_Energy_Ratio', 
-            'w_Sys_Part_Reward', 'Proximity_Reward', 'Coverage_Reward', 'Association_Bonus', 'Boundary_Penalty', 'Collision_Penalty'
-        ]
-        df = df[cols_order]
+        for j in range(self.n_uavs):
+            obs = np.concatenate([
+                user_pos,
+                uav_pos,
+                [self.uavs[j]['energy'] / self.base.norm_energy_uav],
+                task_sizes,
+                task_cycles,
+                [1.0],
+                [(self.n_users + j) / self.agent_num],
+            ]).astype(np.float32)
+            obs_list.append(obs)
 
-        # 3. 写入文件 (使用 utf-8-sig 确保 Excel 打开中文不乱码)
-        with open(path, 'w', encoding='utf-8-sig') as f:
-            f.write(formula_text)         
-            df.to_csv(f, index=False)
-        print(f"  >>> Saved Reward Details Table to {self.reward_dir}")
+        return obs_list
+
+    # =========================================================
+    # 环境步进
+    # =========================================================
+    def step(self, actions):
+        # ---------- 1. 解析动作 ----------
+        user_ratios, user_assocs = self._parse_user_actions(actions)
+        uav_speeds, uav_dirs, uav_freqs = self._parse_uav_actions(actions)
+
+        # ---------- 2. 更新位置 ----------
+        self._update_uav_positions(uav_speeds, uav_dirs)
+        self.physics.update_user_positions(self.users)
+
+        # ---------- 3. 统计每个UAV关联的用户 ----------
+        users_per_uav = [[] for _ in range(self.n_uavs)]
+        for i in range(self.n_users):
+            if user_assocs[i] > 0:
+                users_per_uav[user_assocs[i] - 1].append(i)
+
+        # ---------- 4. 计算时延和能耗 ----------
+        (user_delays, user_energies, uav_comp_energies,
+         uav_fly_energies, deadline_violations) = self._compute_delays_and_energies(
+            user_ratios, user_assocs, uav_freqs, uav_speeds, users_per_uav)
+
+        # ---------- 5. 计算奖励 ----------
+        rewards, reward_details = self._compute_rewards(
+            user_delays, user_energies, deadline_violations,
+            uav_fly_energies, uav_comp_energies, users_per_uav)
+
+        # ---------- 6. 新任务 + 新观测 ----------
+        self._generate_tasks()
+        self.current_step += 1
+        obs_list = self._get_obs()
+
+        done = self.current_step >= self.max_steps
+        dones = [done] * self.agent_num
+
+        infos = self._build_infos(
+            user_delays, user_energies, deadline_violations,
+            uav_fly_energies, uav_comp_energies, reward_details)
+
+        return [obs_list, rewards, dones, infos]
+
+    # =========================================================
+    # 动作解析
+    # =========================================================
+    def _parse_user_actions(self, actions):
+        user_ratios = []
+        user_assocs = []
+        for i in range(self.n_users):
+            act = actions[i]
+            ratio = _sigmoid(act[0])
+            assoc = int(np.argmax(act[1:1 + 1 + self.n_uavs]))
+            if assoc == 0:
+                ratio = 0.0
+            user_ratios.append(ratio)
+            user_assocs.append(assoc)
+        return user_ratios, user_assocs
+
+    def _parse_uav_actions(self, actions):
+        uav_speeds = []
+        uav_dirs = []
+        uav_freqs = []
+        for j in range(self.n_uavs):
+            act = actions[self.n_users + j]
+            speed = _sigmoid(act[0]) * self.base.uav_v_max
+            direction = np.tanh(act[1]) * np.pi
+            raw_f = act[2:2 + self.n_users]
+            exp_f = np.exp(raw_f - np.max(raw_f))
+            freq = (exp_f / np.sum(exp_f)) * self.base.C_uav
+            uav_speeds.append(speed)
+            uav_dirs.append(direction)
+            uav_freqs.append(freq)
+        return uav_speeds, uav_dirs, uav_freqs
+
+    # =========================================================
+    # 位置更新
+    # =========================================================
+    def _update_uav_positions(self, uav_speeds, uav_dirs):
+        for j in range(self.n_uavs):
+            dx = uav_speeds[j] * np.cos(uav_dirs[j]) * self.base.time_step
+            dy = uav_speeds[j] * np.sin(uav_dirs[j]) * self.base.time_step
+            new_pos = self.uavs[j]['position'] + np.array([dx, dy])
+            new_pos[0] = np.clip(new_pos[0], self.base.field_X[0], self.base.field_X[1])
+            new_pos[1] = np.clip(new_pos[1], self.base.field_Y[0], self.base.field_Y[1])
+            self.uavs[j]['position'] = new_pos
+
+    # =========================================================
+    # 时延 & 能耗计算 (论文公式 14-24)
+    # =========================================================
+    def _compute_delays_and_energies(self, user_ratios, user_assocs,
+                                     uav_freqs, uav_speeds, users_per_uav):
+        user_delays = np.zeros(self.n_users)
+        user_energies = np.zeros(self.n_users)
+        uav_comp_energies = np.zeros(self.n_uavs)
+        uav_fly_energies = np.zeros(self.n_uavs)
+        deadline_violations = np.zeros(self.n_users)
+
+        for i in range(self.n_users):
+            D = self.tasks[i]['data_size']
+            C = self.tasks[i]['cpu_cycles']
+            tau = self.tasks[i]['deadline']
+            lam = user_ratios[i]
+            assoc = user_assocs[i]
+            local_frac = 1.0 - lam
+
+            # --- 本地计算 (eq.14, eq.19) ---
+            T_local = 0.0
+            E_local = 0.0
+            if local_frac > 1e-8:
+                T_local = local_frac * D * C / self.base.C_local
+                E_local = self.base.k_local * (self.base.C_local ** 2) * local_frac * D * C
+
+            # --- 卸载计算 (eq.15, eq.20) ---
+            T_off = 0.0
+            E_tx = 0.0
+            if assoc > 0 and lam > 1e-8:
+                uav_idx = assoc - 1
+                g = self.physics.get_channel_gain(
+                    self.users[i]['position'], self.uavs[uav_idx]['position'])
+                n_assoc = max(len(users_per_uav[uav_idx]), 1)
+                bw = self.base.B_total / n_assoc
+                R = self.physics.compute_rate(g, bw, self.base.p_tx_max)
+
+                if R > 1e-3:
+                    T_tx = lam * D / R
+                else:
+                    T_tx = tau * 100.0
+
+                f_mu = max(uav_freqs[uav_idx][i], 1e3)
+                T_comp_uav = lam * D * C / f_mu
+                T_off = T_tx + T_comp_uav
+
+                E_tx = self.base.p_tx_max * T_tx
+                uav_comp_energies[uav_idx] += self.base.xi_m * lam * D * C
+
+            # --- 任务完成时延 (eq.17) ---
+            T_u = max(T_local, T_off)
+            T_u = min(T_u, tau * 5.0)
+            user_delays[i] = T_u
+
+            # --- 用户总能耗 (eq.21) ---
+            E_u = E_local + E_tx
+            user_energies[i] = E_u
+            self.users[i]['energy'] = E_u
+
+            if T_u > tau:
+                deadline_violations[i] = 1.0
+
+        # --- 无人机飞行能耗 (eq.22, eq.24) ---
+        for j in range(self.n_uavs):
+            E_fly = self.physics.compute_uav_energy(uav_speeds[j])
+            uav_fly_energies[j] = E_fly
+            E_total = E_fly + uav_comp_energies[j]
+            self.uavs[j]['energy'] = E_total
+            self.uavs[j]['cumulative_energy'] += E_total
+
+        return (user_delays, user_energies, uav_comp_energies,
+                uav_fly_energies, deadline_violations)
+
+    # =========================================================
+    # 奖励计算  (论文目标: min 总成本 = μ_L·时延 + μ_E·能耗)
+    # =========================================================
+    def _compute_rewards(self, user_delays, user_energies, violations,
+                         uav_fly_e, uav_comp_e, users_per_uav):
+        b = self.base
+
+        # ---- 1. 全本地计算基线 ----
+        baseline_delay_costs = []
+        baseline_user_energies = []
+        for i in range(self.n_users):
+            D = self.tasks[i]['data_size']
+            C = self.tasks[i]['cpu_cycles']
+            omega = b.omega_H if self.users[i]['priority'] == 1 else b.omega_L
+            T_base = D * C / b.C_local
+            E_base = b.k_local * (b.C_local ** 2) * D * C
+            baseline_delay_costs.append(omega * T_base / b.latency_max)
+            baseline_user_energies.append(E_base)
+        avg_baseline_delay = float(np.mean(baseline_delay_costs))
+        avg_baseline_energy = float(np.mean(baseline_user_energies) / b.norm_energy_user)
+
+        # ---- 2. 实际时延成本 ----
+        actual_delay_costs = np.zeros(self.n_users)
+        for i in range(self.n_users):
+            omega = b.omega_H if self.users[i]['priority'] == 1 else b.omega_L
+            capped_delay = min(user_delays[i], b.latency_max * 5.0)
+            actual_delay_costs[i] = omega * capped_delay / b.latency_max
+        avg_actual_delay = float(np.mean(actual_delay_costs))
+
+        # ---- 3. 实际能耗成本 (用户+UAV, 归一化) ----
+        avg_user_energy = float(np.mean(user_energies) / b.norm_energy_user)
+        avg_uav_energy = float(np.mean(uav_fly_e + uav_comp_e) / b.norm_energy_uav)
+        actual_energy_cost = avg_user_energy + avg_uav_energy
+
+        # ---- 4. 系统奖励 = 时延节省 - 能耗成本 - 违约惩罚 ----
+        delay_saving = (avg_baseline_delay - avg_actual_delay) / max(avg_baseline_delay, 1e-6)
+        energy_penalty = b.mu_E * (actual_energy_cost - avg_baseline_energy)
+        violation_rate = float(np.mean(violations))
+        system_reward = delay_saving - energy_penalty - b.w_penalty * violation_rate
+
+        rewards = []
+        reward_details = []
+
+        # ---- 5. 用户奖励: w1*系统奖励 - w2*个体成本(时延+能耗) ----
+        user_rewards_raw = []
+        for i in range(self.n_users):
+            omega = b.omega_H if self.users[i]['priority'] == 1 else b.omega_L
+            delay_ratio = min(user_delays[i] / b.latency_max, 5.0)
+            energy_ratio = min(user_energies[i] / b.norm_energy_user, 5.0)
+            user_cost = omega * (b.mu_L * delay_ratio + b.mu_E * energy_ratio)
+
+            w1_sys = b.w1_user * system_reward
+            neg_w2_cost = -b.w2_user * user_cost
+            r = np.clip(w1_sys + neg_w2_cost, -10.0, 10.0)
+            user_rewards_raw.append(r)
+            rewards.append([r])
+            reward_details.append({
+                'agent_type': 'user',
+                'system_reward': float(system_reward),
+                'delay_saving': float(delay_saving),
+                'energy_penalty': float(energy_penalty),
+                'violation_rate': violation_rate,
+                'w1_system': float(w1_sys),
+                'user_cost': float(user_cost),
+                'delay_ratio': float(delay_ratio),
+                'energy_ratio': float(energy_ratio),
+                'neg_w2_cost': float(neg_w2_cost),
+                'total': float(r),
+            })
+
+        # ---- 6. 无人机奖励 ----
+        user_positions = np.array([u['position'] for u in self.users])
+        user_centroid = np.mean(user_positions, axis=0)
+        half_diag = np.sqrt((b.field_X[1] - b.field_X[0]) ** 2
+                            + (b.field_Y[1] - b.field_Y[0]) ** 2) / 2.0
+
+        for j in range(self.n_uavs):
+            pos = self.uavs[j]['position']
+
+            # (a) 接近奖励
+            dist_to_centroid = np.linalg.norm(pos - user_centroid)
+            proximity = max(0.0, 1.0 - dist_to_centroid / half_diag)
+            proximity_reward = b.w_proximity * proximity
+
+            # (b) 覆盖奖励
+            dists_to_users = np.linalg.norm(user_positions - pos, axis=1)
+            n_covered = int(np.sum(dists_to_users < b.coverage_radius))
+            coverage_reward = b.w_coverage * n_covered / self.n_users
+
+            # (c) 关联奖励
+            n_assoc = len(users_per_uav[j])
+            assoc_bonus = n_assoc / self.n_users
+
+            # (d) 能耗惩罚 (飞行+计算, 激励低速节能飞行)
+            uav_total_e = uav_fly_e[j] + uav_comp_e[j]
+            energy_pen = b.w_energy_uav * uav_total_e / b.norm_energy_uav
+
+            # (e) 越界惩罚
+            boundary_pen = 0.0
+            dist_to_edge = min(
+                pos[0] - b.field_X[0], b.field_X[1] - pos[0],
+                pos[1] - b.field_Y[0], b.field_Y[1] - pos[1])
+            if dist_to_edge < b.boundary_warn:
+                boundary_pen = b.w_guide * (b.boundary_warn - dist_to_edge) / b.boundary_warn
+
+            # (f) 碰撞惩罚
+            collision_pen = 0.0
+            for k in range(self.n_uavs):
+                if k != j:
+                    d = np.linalg.norm(pos - self.uavs[k]['position'])
+                    if d < b.uav_safe_dist:
+                        collision_pen += b.w_collision * (b.uav_safe_dist - d) / b.uav_safe_dist
+
+            uav_individual = (proximity_reward + coverage_reward + assoc_bonus
+                              - energy_pen - boundary_pen - collision_pen)
+
+            w_sys_part = b.w_sys_uav * system_reward
+            w_ind_part = b.w_ind_uav * uav_individual
+            r_uav = np.clip(w_sys_part + w_ind_part, -10.0, 10.0)
+            rewards.append([r_uav])
+            reward_details.append({
+                'agent_type': 'uav',
+                'system_reward': float(system_reward),
+                'delay_saving': float(delay_saving),
+                'energy_penalty_sys': float(energy_penalty),
+                'w_sys_part': float(w_sys_part),
+                'proximity_reward': float(proximity_reward),
+                'coverage_reward': float(coverage_reward),
+                'assoc_bonus': float(assoc_bonus),
+                'energy_pen': float(energy_pen),
+                'boundary_pen': float(boundary_pen),
+                'collision_pen': float(collision_pen),
+                'uav_individual': float(uav_individual),
+                'w_ind_part': float(w_ind_part),
+                'total': float(r_uav),
+            })
+
+        return rewards, reward_details
+
+    # =========================================================
+    # 辅助
+    # =========================================================
+    def _build_infos(self, user_delays, user_energies, violations,
+                     uav_fly_e, uav_comp_e, reward_details):
+        total_sys_energy = float(np.sum(user_energies) + np.sum(uav_fly_e + uav_comp_e))
+        avg_delay = float(np.mean(user_delays))
+
+        infos = []
+        for i in range(self.n_users):
+            infos.append({
+                'delay': float(user_delays[i]),
+                'energy': float(user_energies[i]),
+                'violation': float(violations[i]),
+                'position': self.users[i]['position'].copy(),
+                'reward_details': reward_details[i],
+                'total_system_energy': total_sys_energy,
+                'avg_user_delay': avg_delay,
+            })
+        for j in range(self.n_uavs):
+            infos.append({
+                'fly_energy': float(uav_fly_e[j]),
+                'comp_energy': float(uav_comp_e[j]),
+                'cumulative_energy': float(self.uavs[j]['cumulative_energy']),
+                'position': self.uavs[j]['position'].copy(),
+                'reward_details': reward_details[self.n_users + j],
+                'total_system_energy': total_sys_energy,
+                'avg_user_delay': avg_delay,
+            })
+        return infos
+
+
+def _sigmoid(x):
+    x = np.clip(x, -10, 10)
+    return 1.0 / (1.0 + np.exp(-x))

@@ -21,12 +21,12 @@ class Base:
         # 2. 归一化参数 (RL收敛核心)
         # =========================
         self.norm_pos = 1000.0
-        self.norm_data = 5e6              
-        self.norm_cycle = 1000.0          
+        self.norm_data = 3e6              # 对齐 task_size_max
+        self.norm_cycle = 500.0           # 对齐 cycles_max
         self.norm_freq = 10e9             
         
         self.norm_energy_uav = 600.0      
-        self.norm_energy_user = 5.0       
+        self.norm_energy_user = 0.5       # 对齐实际用户能耗量级 (~0.01-0.3J)
 
         # =========================
         # 3. 通信与信道参数 (Urban LoS)
@@ -78,12 +78,11 @@ class Base:
         # =========================
         # 6. 任务生成
         # =========================
-        self.task_size_min = 1e6  
-        #self.task_size_max = 5e6
-        self.task_size_max = 2e6
-        self.cycles_min = 500
-        self.cycles_max = 1000
-        self.latency_max = 3.0
+        self.task_size_min = 0.5e6   # 500 KB
+        self.task_size_max = 3e6     # 3 MB
+        self.cycles_min = 200        # cycles/bit
+        self.cycles_max = 500        # cycles/bit
+        self.latency_max = 1.0       # 1 时隙 = 1 秒
 
         # =========================
         # 7. 成本函数权重 (对应论文 eq.28)
@@ -97,21 +96,22 @@ class Base:
         # =========================
         # 8. RL 奖励权重
         # =========================
-        self.w_penalty = 2.0       # 超时惩罚权重
-        self.w_overboundary = 0.5        # 无人机越界惩罚
-        self.w_collision = 1.0     # 无人机碰撞惩罚
+        self.w_penalty = 2.0
+        self.w_overboundary = 0.5
+        self.w_collision = 1.0
 
-        self.w1_user = 0.4         # 用户奖励中系统奖励权重
-        self.w2_user = 0.6         # 用户奖励中个体成本权重
-        self.w_sys_uav = 0.3       # 无人机奖励中系统奖励权重
-        self.w_ind_uav = 0.7       # 无人机奖励中个体奖励权重
+        self.w1_user = 0.4
+        self.w2_user = 0.6
+        self.w_sys_uav = 0.3
+        self.w_ind_uav = 0.7
 
         # self.w_proximity = 2.0     # 无人机接近用户的奖励权重
         # self.w_coverage = 1.5      # 无人机覆盖用户的奖励权重
-        self.w_proximity = 0.5     # 无人机接近用户的奖励权重
+        
         #self.w_coverage = 0.5      # 无人机覆盖用户的奖励权重
-        self.w_coverage = 0      # 无人机覆盖用户的奖励权重
-
+        self.w_proximity = 2.0
+        self.w_coverage = 1.5
+        self.w_energy_uav = 0.5
         # =========================
         # 9. 安全约束
         # =========================
