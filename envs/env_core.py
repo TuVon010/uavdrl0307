@@ -368,14 +368,31 @@ class EnvCore(object):
         user_centroid = np.mean(user_positions, axis=0)
         half_diag = np.sqrt((b.field_X[1] - b.field_X[0]) ** 2
                             + (b.field_Y[1] - b.field_Y[0]) ** 2) / 2.0
+        transition_dist = b.coverage_radius
 
         for j in range(self.n_uavs):
             pos = self.uavs[j]['position']
 
             # (a) 接近奖励: 用地图半对角线归一化, 保证初始位置有梯度
             dist_to_centroid = np.linalg.norm(pos - user_centroid)
-            proximity = max(0.0, 1.0 - dist_to_centroid / half_diag)
-            proximity_reward = b.w_proximity * proximity
+
+            # 远近权重: 平滑过渡
+            far_weight = min(1.0, dist_to_centroid / transition_dist)
+            near_weight = 1.0 - far_weight
+
+            # (a) 远程引导: 距离远→强引导飞向用户质心, 距离近→引导减弱
+            centroid_proximity = max(0.0, 1.0 - dist_to_centroid / half_diag)
+            centroid_guide = b.w_proximity * far_weight * centroid_proximity
+
+            # (b) 近程引导: 距离近→强引导飞向关联用户质心, 距离远→无引导
+            assoc_guide = 0.0
+            if users_per_uav[j]:
+                assoc_pos = np.array([self.users[uid]['position']
+                                      for uid in users_per_uav[j]])
+                assoc_center = np.mean(assoc_pos, axis=0)
+                dist_to_assoc = np.linalg.norm(pos - assoc_center)
+                assoc_proximity = max(0.0, 1.0 - dist_to_assoc / transition_dist)
+                assoc_guide = b.w_assoc_guide * near_weight * assoc_proximity
 
             # (b) 覆盖奖励: 覆盖范围内的用户比例
             dists_to_users = np.linalg.norm(user_positions - pos, axis=1)
@@ -406,7 +423,8 @@ class EnvCore(object):
                     if d < b.uav_safe_dist:
                         collision_pen += b.w_collision * (b.uav_safe_dist - d) / b.uav_safe_dist
 
-            uav_individual = (proximity_reward + coverage_reward + assoc_bonus
+            uav_individual = (centroid_guide + assoc_guide
+                              + coverage_reward + assoc_bonus
                               - energy_pen - boundary_pen - collision_pen)
 
             w_sys_part = b.w_sys_uav * system_reward
@@ -419,7 +437,8 @@ class EnvCore(object):
                 'delay_saving': float(delay_saving),
                 'energy_penalty_sys': float(energy_penalty),
                 'w_sys_part': float(w_sys_part),
-                'proximity_reward': float(proximity_reward),
+                'centroid_guide': float(centroid_guide),
+                'assoc_guide': float(assoc_guide),
                 'coverage_reward': float(coverage_reward),
                 'assoc_bonus': float(assoc_bonus),
                 'energy_pen': float(energy_pen),

@@ -110,6 +110,7 @@ class Base:
         
         #self.w_coverage = 0.5      # 无人机覆盖用户的奖励权重
         self.w_proximity = 2.0
+        self.w_assoc_guide = 2.5   # 近程引导: 飞向关联用户质心
         self.w_coverage = 1.5
         self.w_energy_uav = 0.5
         # =========================
