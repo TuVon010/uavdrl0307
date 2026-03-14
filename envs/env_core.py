@@ -412,7 +412,7 @@ class EnvCore(object):
             dist_to_edge = min(
                 pos[0] - b.field_X[0], b.field_X[1] - pos[0],
                 pos[1] - b.field_Y[0], b.field_Y[1] - pos[1])
-            if dist_to_edge < b.boundary_warn:
+            if dist_to_edge <= b.boundary_warn:
                 boundary_pen = b.w_overboundary * (b.boundary_warn - dist_to_edge) / b.boundary_warn
 
             # (e) 碰撞惩罚
